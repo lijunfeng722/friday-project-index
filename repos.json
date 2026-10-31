@@ -1,0 +1,69 @@
+{
+  "reviewed_on": "2026-10-31",
+  "guide_site": "https://lijunfeng722.github.io/friday-user-guide/",
+  "repositories": [
+    {
+      "id": "friday",
+      "name": "Friday",
+      "url": "https://github.com/Geeprox/Friday",
+      "role": "家庭产品主仓：Web 界面、设备操作、手势、回看与原生组件",
+      "kind": "主项目",
+      "deployment": "独立运行；本地视觉属于本仓库，不是 Miloco 内置手势",
+      "required": "核心"
+    },
+    {
+      "id": "arl",
+      "name": "ARL",
+      "url": "https://github.com/Geeprox/ARL",
+      "role": "共享智能运行服务与原生管理界面",
+      "kind": "相关项目",
+      "deployment": "独立服务；本地确定性手势不要求先接通模型任务",
+      "required": "智能能力按需"
+    },
+    {
+      "id": "user-guide",
+      "name": "Friday 用户手册",
+      "url": "https://github.com/lijunfeng722/friday-user-guide",
+      "role": "面向家庭使用者的图文手册与 GitHub Pages",
+      "kind": "独立文档",
+      "deployment": "静态站点，不连接家庭账号或设备",
+      "required": "使用文档"
+    },
+    {
+      "id": "home-assistant",
+      "name": "Home Assistant Core",
+      "url": "https://github.com/home-assistant/core",
+      "role": "家庭房间、设备、状态和服务的统一接入",
+      "kind": "外部依赖",
+      "deployment": "独立服务；macOS 可在 Linux 虚拟机中运行 HA Container",
+      "required": "真实家庭接入"
+    },
+    {
+      "id": "xiaomi-home",
+      "name": "Xiaomi Home 集成",
+      "url": "https://github.com/XiaoMi/ha_xiaomi_home",
+      "role": "让 HA 接入小米家庭账号与受支持设备",
+      "kind": "HA 集成",
+      "deployment": "安装在 HA 内部，不作为另一套独立服务启动",
+      "required": "HA 接入小米设备时"
+    },
+    {
+      "id": "miloco",
+      "name": "Xiaomi Miloco",
+      "url": "https://github.com/XiaoMi/xiaomi-miloco",
+      "role": "小米授权、摄像头与智能服务相关能力",
+      "kind": "外部可选服务",
+      "deployment": "按其固定版本官方平台指南安装；与 Friday 本地视觉分别准备",
+      "required": "按摄像头方案选用"
+    },
+    {
+      "id": "openclaw",
+      "name": "OpenClaw",
+      "url": "https://github.com/openclaw/openclaw",
+      "role": "本次选用的 Miloco 插件宿主平台",
+      "kind": "可选宿主",
+      "deployment": "按 Miloco 的 OpenClaw 平台说明独立安装",
+      "required": "选择该 Miloco 部署方案时"
+    }
+  ]
+}

@@ -2,9 +2,9 @@
 
 从一个入口找到 Friday 相关源码、用户手册和外部依赖，并理解它们之间的分工。
 
-- **想使用产品：**先读 [Friday 用户手册](https://lijunfeng722.github.io/friday-user-guide/)。
-- **想维护代码或部署：**从下表进入对应仓库，再看[整体架构](docs/architecture.md)。
-- **想更新索引：**按[维护方式](docs/maintenance.md)核对来源、关系与链接。
+- **想使用产品**：先读 [Friday 用户手册](https://lijunfeng722.github.io/friday-user-guide/)。
+- **想维护代码或部署**：从下表进入对应仓库，再看[整体架构](docs/architecture.md)。
+- **想更新索引**：按[维护方式](docs/maintenance.md)核对来源、关系与链接。
 
 ## 仓库索引
 

@@ -8,13 +8,16 @@
 | --- | --- | --- |
 | Friday 应用、业务和本地视觉代码 | [Friday](https://github.com/Geeprox/Friday) | 产品 README 与部署文档 |
 | 安装教程、日常操作和常见问题 | [friday-user-guide 文档源码](https://github.com/lijunfeng722/friday-user-guide/tree/main/docs) | [在线用户手册](https://lijunfeng722.github.io/friday-user-guide/) |
-| 可下载的启停与依赖维护脚本 | [friday-user-guide 脚本源码](https://github.com/lijunfeng722/friday-user-guide/tree/main/docs/assets/scripts) | 用户手册提供下载与校验步骤 |
+| 依赖安装器、离线升级与回归测试源码 | [Friday 安装器](https://github.com/Geeprox/Friday/blob/main/scripts/setup-dependencies.py)及[测试](https://github.com/Geeprox/Friday/blob/main/tests/test_dependency_upgrades.py) | Friday 自带安装器，用户手册提供同内容下载副本 |
+| 启停工具、安装器下载副本和校验清单 | [friday-user-guide 工具目录](https://github.com/lijunfeng722/friday-user-guide/tree/main/docs/assets/scripts) | 用户手册提供下载与校验步骤 |
 | 跨仓库关系、维护入口和版本说明 | 本元仓库 | [总索引](../README.md)、[架构](architecture.md)及本页 |
 | 本机服务清单、账号、规则、备份和原始诊断 | 自己部署环境的私有目录 | 由本机维护者管理，不提交到公开仓库 |
 
-**GitHub Pages 是文档与下载站点。** 启停脚本由你下载后在部署电脑执行，站点本身不连接家庭或运行服务。本元仓库引用同一份公开脚本，避免分别复制后版本不一致。
+**GitHub Pages 是文档与下载站点。** 启停脚本由你下载后在部署电脑执行，站点本身不连接家庭或运行服务。本元仓库引用产品源码与文档仓库的对应工具，说明它们的职责和版本关系。
 
-Friday 应用源码中的自带安装器与这里发布的独立维护工具可能处于不同版本。按用户手册下载更新工具，并显式指定已有 Friday 安装目录；不能因为本机有源码修改，就认为上游仓库也已经发布该修改。
+安装器修复现已提交并推送到 **`Geeprox/Friday` 的 `main`**，公开提交为 [`4ecf56c`](https://github.com/Geeprox/Friday/commit/4ecf56c6a515f1fe1d6494e3632a2257490353ad)。提交包含安装器、回归测试和部署说明三个文件，基于原远端公开版本独立整理。该版本安装器与用户手册仓库已发布的下载副本内容一致。
+
+使用较早 Friday 版本时，仍按用户手册下载工具并指定原安装目录；使用上述提交或包含它的新版本时，也可以直接使用仓库中的 `scripts/setup-dependencies.py`。更新版本应同时核对源码提交与下载副本的校验清单。
 
 ## 按任务选择入口
 
@@ -36,7 +39,7 @@ Friday 应用源码中的自带安装器与这里发布的独立维护工具可�
 | [stop-friday.sh](https://github.com/lijunfeng722/friday-user-guide/blob/main/docs/assets/scripts/stop-friday.sh) | 请求正常停止，等待已登记服务与子进程收尾 |
 | [restart-friday.sh](https://github.com/lijunfeng722/friday-user-guide/blob/main/docs/assets/scripts/restart-friday.sh) | 正常停止后按依赖顺序重新启动 |
 | [SHA256SUMS](https://github.com/lijunfeng722/friday-user-guide/blob/main/docs/assets/scripts/SHA256SUMS) | 校验上述三个文件 |
-| [setup-dependencies.py](https://github.com/lijunfeng722/friday-user-guide/blob/main/docs/assets/scripts/setup-dependencies.py) | 固定依赖来源和版本，支持 Xiaomi Home 来源预取、首次安装和显式离线升级 |
+| [setup-dependencies.py 源码](https://github.com/Geeprox/Friday/blob/main/scripts/setup-dependencies.py) / [下载副本](https://github.com/lijunfeng722/friday-user-guide/blob/main/docs/assets/scripts/setup-dependencies.py) | 固定依赖来源和版本，支持 Xiaomi Home 来源预取、首次安装和显式离线升级 |
 | [SETUP-SHA256SUMS](https://github.com/lijunfeng722/friday-user-guide/blob/main/docs/assets/scripts/SETUP-SHA256SUMS) | 校验依赖工具及其许可证 |
 
 先按[用户手册](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/#1-日常启动与停止)下载、校验并初始化自己的 `services.local.json`。已有交付包时直接使用原配置；macOS 的“优雅停止.command”“重新启动.command”可以调用同一管理程序。
@@ -124,7 +127,8 @@ flowchart TD
 | 2026-10-31 | 安装工具固定 Xiaomi Home v0.5.0，补充来源核对、显式离线升级和替换失败恢复 | 10 项安装器与 18 项相关发布输入检查通过；隔离 HA 迁移预演保留原实体标识和设备关联 |
 | 2026-10-31 | 实际正常下线、完整备份、升级和上线 | macOS 部署中原规则、控制范围和摄像头配置保留；绑定设备状态与摄像头服务恢复 |
 | 2026-11-01 | 使用者确认“双臂张开 → 合上”后，页面显示成功、窗帘实际动作 | 本次既有窗帘规则的重启后实体验收通过，不扩展为所有设备或平台均通过 |
+| 2026-11-01 | 安装器修复推送到 `Geeprox/Friday main`，提交 [4ecf56c](https://github.com/Geeprox/Friday/commit/4ecf56c6a515f1fe1d6494e3632a2257490353ad) | 三个文件独立提交；28 项安装与发布检查通过，源码及无历史导出扫描通过；下载副本与源码一致 |
 
 上述公开维护工具与详细教程已发布于用户手册仓库的提交 [`b5e0815`](https://github.com/lijunfeng722/friday-user-guide/commit/b5e0815a861248ba8365bed5f65facd05a395602)。原始诊断、账号、设备清单及备份保留在本机私有目录；公开说明只记录问题、处理方法和验证范围。
 
-后续修改脚本时，同步该仓库的校验清单、用户教程和本站入口；更新要求见[维护索引](maintenance.md)。
+后续修改安装器时，同步 Friday 源码、文档仓库的下载副本和校验清单、用户教程以及本站的提交状态与入口；更新要求见[维护索引](maintenance.md)。

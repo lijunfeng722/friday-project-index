@@ -31,11 +31,12 @@ Friday 的人体和手势代码位于 Friday 仓库。Miloco 能播放摄像头�
 | --- | --- |
 | 从零安装 macOS / Linux 环境 | [安装总览](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation/) |
 | 正常停止、重新启动和查看状态 | [启停使用步骤](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/#1-日常启动与停止) |
-| 查找启停与依赖安装脚本的源码、校验清单 | [公开脚本目录](https://github.com/lijunfeng722/friday-user-guide/tree/main/docs/assets/scripts) |
+| 查找依赖安装器的源码与修复提交 | [Friday 安装器](https://github.com/Geeprox/Friday/blob/main/scripts/setup-dependencies.py) · [修复提交 4ecf56c](https://github.com/Geeprox/Friday/commit/4ecf56c6a515f1fe1d6494e3632a2257490353ad) |
+| 查找启停脚本、安装器下载副本与校验清单 | [公开下载工具目录](https://github.com/lijunfeng722/friday-user-guide/tree/main/docs/assets/scripts) |
 | 升级已有 Xiaomi Home，处理重启后的设备不可用 | [升级与排障说明](docs/operations.md) |
 | 了解本轮修改、版本与验收范围 | [2026-11-01 维护记录](docs/operations.md#本轮维护与验收记录) |
 
-维护脚本源码保存在 `friday-user-guide`，GitHub Pages 提供文档阅读与脚本下载；本元仓库提供总入口和跨仓库说明。每台机器的 `services.local.json`、账号授权、家庭数据、备份及原始日志保存在本机私有目录。
+安装器修复已推送到 `Geeprox/Friday` 的 `main`；`friday-user-guide` 维护启停工具、安装器下载副本和校验清单，GitHub Pages 提供文档阅读与下载；本元仓库提供总入口和跨仓库说明。每台机器的 `services.local.json`、账号授权、家庭数据、备份及原始日志保存在本机私有目录。
 
 ```mermaid
 flowchart LR

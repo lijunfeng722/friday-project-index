@@ -31,6 +31,7 @@ Friday 的人体和手势代码位于 Friday 仓库。Miloco 能播放摄像头�
 | --- | --- |
 | 从零安装 macOS / Linux 环境 | [安装总览](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation/) |
 | 正常停止、重新启动和查看状态 | [启停使用步骤](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/#1-日常启动与停止) |
+| 电脑重新开机后恢复服务 | [整机重启恢复与旧进程记录处理](docs/operations.md#电脑重启后的恢复) |
 | 查找依赖安装器的源码与修复提交 | [Friday 安装器](https://github.com/Geeprox/Friday/blob/main/scripts/setup-dependencies.py) · [修复提交 4ecf56c](https://github.com/Geeprox/Friday/commit/4ecf56c6a515f1fe1d6494e3632a2257490353ad) |
 | 查找启停脚本、安装器下载副本与校验清单 | [公开下载工具目录](https://github.com/lijunfeng722/friday-user-guide/tree/main/docs/assets/scripts) |
 | 升级已有 Xiaomi Home，处理重启后的设备不可用 | [升级与排障说明](docs/operations.md) |

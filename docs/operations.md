@@ -89,6 +89,16 @@ flowchart TD
 
 日常重启不自动更新依赖，不重新初始化账号，不逐台重复授权。已有暂停设置会保留。正常退出超时、进程归属不符或恢复检查失败时，脚本报告错误，停止继续本轮操作；以逐项输出确认哪些服务仍在运行。
 
+## 电脑重启后的恢复
+
+重新开机后继续使用原重启入口。完整部署配置会先启动已登记的容器主机；基础配置未管理 Docker / Colima 时，先按原方式启动它，再恢复 HA 和 Friday。
+
+旧管理程序曾在整机重启后遇到 `pid_identity_mismatch`：上次开机保存的进程编号已被其他程序复用，身份保护检查因此拒绝继续。此问题已在用户手册仓库的提交 [d29b24c](https://github.com/lijunfeng722/friday-user-guide/commit/d29b24c86dc4ded92098489cf18bedecf5c2a179)修复。管理程序读取内核开机时间，跳过开机前写入的旧记录；本次开机的身份不符或无法读取开机时间时，仍保留原保护检查。
+
+更新管理脚本及其 SHA256 清单，保留自己的 `services.local.json` 后再使用原入口。具体下载与操作见[用户手册的重新开机说明](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/#电脑重新开机后)。不需要重新初始化账号或按旧编号手动结束其他程序。
+
+本轮 macOS 实际恢复已返回 `restart_complete`，各项服务、真实家庭来源、摄像头及启用规则的目标状态检查通过，原规则、控制范围和开关保留；macOS / 隔离 Linux 各 18 项检查通过。本次恢复后的设备实物动作由使用者另行确认。
+
 ## Xiaomi Home 版本与升级
 
 本轮验证的组合为 HA **2026.10.4**、Xiaomi Home **v0.5.0**。集成固定官方提交 [`75b3acb6325a3a8d295688b13904737d6738a6a5`](https://github.com/XiaoMi/ha_xiaomi_home/commit/75b3acb6325a3a8d295688b13904737d6738a6a5)，用于复现这次维护结果，并不表示未来自动跟随最新版本。
@@ -128,6 +138,7 @@ flowchart TD
 | 2026-10-31 | 实际正常下线、完整备份、升级和上线 | macOS 部署中原规则、控制范围和摄像头配置保留；绑定设备状态与摄像头服务恢复 |
 | 2026-11-01 | 使用者确认“双臂张开 → 合上”后，页面显示成功、窗帘实际动作 | 本次既有窗帘规则的重启后实体验收通过，不扩展为所有设备或平台均通过 |
 | 2026-11-01 | 安装器修复推送到 `Geeprox/Friday main`，提交 [4ecf56c](https://github.com/Geeprox/Friday/commit/4ecf56c6a515f1fe1d6494e3632a2257490353ad) | 三个文件独立提交；28 项安装与发布检查通过，源码及无历史导出扫描通过；下载副本与源码一致 |
+| 2026-11-01 | 整机重启后旧进程编号复用的恢复修复，用户手册仓库提交 [d29b24c](https://github.com/lijunfeng722/friday-user-guide/commit/d29b24c86dc4ded92098489cf18bedecf5c2a179) | macOS 实际重启入口恢复成功，macOS / 隔离 Linux 各 18 项检查通过；本次实物动作另行验收 |
 
 上述公开维护工具与详细教程已发布于用户手册仓库的提交 [`b5e0815`](https://github.com/lijunfeng722/friday-user-guide/commit/b5e0815a861248ba8365bed5f65facd05a395602)。原始诊断、账号、设备清单及备份保留在本机私有目录；公开说明只记录问题、处理方法和验证范围。
 

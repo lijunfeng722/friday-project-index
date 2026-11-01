@@ -32,6 +32,7 @@ Friday 的人体和手势代码位于 Friday 仓库。Miloco 能播放摄像头�
 | 从零安装 macOS / Linux 环境 | [安装总览](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation/) |
 | 正常停止、重新启动和查看状态 | [启停使用步骤](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/#1-日常启动与停止) |
 | 电脑重新开机后恢复服务 | [整机重启恢复与旧进程记录处理](docs/operations.md#电脑重启后的恢复) |
+| Miloco 启动报错，稍后又能打开页面 | [较慢启动的就绪等待](docs/operations.md#miloco-冷启动的等待) |
 | 多人入镜时手势无响应或需要切换操作者 | [明确选择操作者](docs/operations.md#多人镜头中的操作者选择) |
 | 张开有响应、紧接着合上却未完成 | [连续手势与设备回读](docs/operations.md#连续手势与设备回读) |
 | 查找依赖安装器的源码与修复提交 | [Friday 安装器](https://github.com/Geeprox/Friday/blob/main/scripts/setup-dependencies.py) · [修复提交 4ecf56c](https://github.com/Geeprox/Friday/commit/4ecf56c6a515f1fe1d6494e3632a2257490353ad) |

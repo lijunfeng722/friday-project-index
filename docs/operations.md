@@ -99,6 +99,14 @@ flowchart TD
 
 本轮 macOS 实际恢复已返回 `restart_complete`，各项服务、真实家庭来源、摄像头及启用规则的目标状态检查通过，原规则、控制范围和开关保留；macOS / 隔离 Linux 各 18 项检查通过。本次恢复后的设备实物动作由使用者另行确认。
 
+## Miloco 冷启动的等待
+
+再次整机重启时，Miloco 启动命令等待健康检查约 30 秒后返回失败，但后台初始化约 47 秒后完成，随后 `/health` 返回 200。旧管理程序只根据启动命令的返回值终止，导致 OpenClaw、ARL 和 Friday 尚未启动。
+
+管理程序已通过用户手册仓库的 [cb0043b](https://github.com/lijunfeng722/friday-user-guide/commit/cb0043bd3a259809d5f3da8fe38658cfd78447cb)修复：服务配置包含独立就绪检查时继续有限等待，只有运行状态与就绪检查同时通过，才启动后续服务；不重复发送启动命令。没有独立就绪检查、进程未运行或健康检查一直失败时，仍报告失败并保留后续服务停止状态。原 PID 归属、正常停止、子进程收尾和设备就绪检查继续使用。
+
+macOS 与隔离 Linux 各 21 项检查通过。本机使用修正后的原重启入口重新上线，保留既有账号、三条规则、控制范围与原开关，实物动作由使用者继续验收。更新[管理脚本与校验清单](https://github.com/lijunfeng722/friday-user-guide/tree/main/docs/assets/scripts)时保留自己的服务清单，操作见[用户手册](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/#miloco-启动较慢时怎么办)。
+
 ## 多人镜头中的操作者选择
 
 识别服务重启后会重新建立临时人物追踪，最先持续入镜的人可能被自动选中。其他人随后进入镜头做动作时，需要先明确选择自己；这一步选择本次动作发起人，不改变设备授权。
@@ -161,6 +169,7 @@ Friday [7c0c6d6](https://github.com/Geeprox/Friday/commit/7c0c6d6f4096654eb87385
 | 2026-11-01 | 已有操作者时允许明确 OK 接管，Friday 提交 [5961567](https://github.com/Geeprox/Friday/commit/5961567d3ed897eed20fb161be6dfa49d522df3d) | 107 项相关回归、源码及导出扫描通过，已重载本机识别服务；用户规则、允许范围、镜头配置及原开关保留，实物验收另行记录 |
 | 2026-11-01 | 修复上一条设备回报阻塞后续手势，Friday 提交 [7c0c6d6](https://github.com/Geeprox/Friday/commit/7c0c6d6f4096654eb873852f43013f3c8c26f874)，相关注释改为中文 [9a45a82](https://github.com/Geeprox/Friday/commit/9a45a82cbfac0c1820c8fa100ad6cb77b9c904c1) | 187 项相关回归与发布扫描通过；本机重载后原配置保留，使用者确认窗帘实际动作及页面新记录 |
 | 2026-11-01 | 将独立发送通道限制为来源明确的 HA 目标，Friday 提交 [b069e20](https://github.com/Geeprox/Friday/commit/b069e20584e4d68f4a7fb9b3731a2f35fc87d29e) | 补充来源缺失、来源未知和旧标识回归，202 项相关检查与发布扫描通过，保留原规则及权限 |
+| 2026-11-01 | 再次重新开机后补充 Miloco 较慢启动的就绪等待，用户手册仓库提交 [cb0043b](https://github.com/lijunfeng722/friday-user-guide/commit/cb0043bd3a259809d5f3da8fe38658cfd78447cb) | macOS 与隔离 Linux 各 21 项检查通过，更新公开管理脚本及校验清单；本机原入口重新上线，实物动作另行确认 |
 
 上述公开维护工具与详细教程已发布于用户手册仓库的提交 [`b5e0815`](https://github.com/lijunfeng722/friday-user-guide/commit/b5e0815a861248ba8365bed5f65facd05a395602)。原始诊断、账号、设备清单及备份保留在本机私有目录；公开说明只记录问题、处理方法和验证范围。
 

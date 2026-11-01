@@ -107,6 +107,14 @@ flowchart TD
 
 使用时面向镜头比 OK 保持约 2 秒，放下手，再做已绑定动作。身体动作仍需要对应关键点清晰可见；本轮未降低姿势判断条件或扩大控制范围。相关 107 项回归和源码发布扫描通过，修复已载入本机；实物验收单独记录。详见[用户手册的操作者切换](https://lijunfeng722.github.io/friday-user-guide/guides/interactions/#多人时选择或切换操作者)。
 
+## 连续手势与设备回读
+
+识别成功后仍要分别检查请求是否发送、HA 是否接受、设备状态是否符合目标，以及使用者是否确认实物动作。本轮有一次“张开”已送达 HA，但 Friday 等待到位回报约 4.5 秒；约 1.4 秒后识别出的“合上”在共用命令锁后等待约 3.2 秒，超过手势 1.5 秒有效期，被拒绝发送。这是 Friday 的排队问题，不能据此判定 Xiaomi Home 断线或手势没有识别。
+
+Friday [7c0c6d6](https://github.com/Geeprox/Friday/commit/7c0c6d6f4096654eb873852f43013f3c8c26f874)将有界只读回报等待移出发送锁，单目标 HA 手势也不再占用外层共用命令锁等待回报。发送占用记录、权限、配置版本与手势时效仍在真正发送前检查；网络发送保持串行，同一动作的重复请求等待该动作结果，结果未知时不重发。相关中文注释见后续提交 [9a45a82](https://github.com/Geeprox/Friday/commit/9a45a82cbfac0c1820c8fa100ad6cb77b9c904c1)。
+
+187 项相关回归、源码与独立导出发布扫描通过。本机已重载 Friday，六份原配置文件逐字节核对一致，保留三条规则及原控制范围；使用者随后确认“窗帘有动作，页面也有新记录”。该结论仅覆盖本次既有窗帘规则，不代表其他设备或平台均已实体验收。回报仍停留在 `opening` 或 `closing` 时，保留结果未确认的状态，不把服务接受请求当作到位证明。用户操作见[连续动作与设备响应](https://lijunfeng722.github.io/friday-user-guide/guides/interactions/#连续动作与设备响应)。
+
 ## Xiaomi Home 版本与升级
 
 本轮验证的组合为 HA **2026.10.4**、Xiaomi Home **v0.5.0**。集成固定官方提交 [`75b3acb6325a3a8d295688b13904737d6738a6a5`](https://github.com/XiaoMi/ha_xiaomi_home/commit/75b3acb6325a3a8d295688b13904737d6738a6a5)，用于复现这次维护结果，并不表示未来自动跟随最新版本。
@@ -149,6 +157,7 @@ flowchart TD
 | 2026-11-01 | 安装器修复推送到 `Geeprox/Friday main`，提交 [4ecf56c](https://github.com/Geeprox/Friday/commit/4ecf56c6a515f1fe1d6494e3632a2257490353ad) | 三个文件独立提交；28 项安装与发布检查通过，源码及无历史导出扫描通过；下载副本与源码一致 |
 | 2026-11-01 | 整机重启后旧进程编号复用的恢复修复，用户手册仓库提交 [d29b24c](https://github.com/lijunfeng722/friday-user-guide/commit/d29b24c86dc4ded92098489cf18bedecf5c2a179) | macOS 实际重启入口恢复成功，macOS / 隔离 Linux 各 18 项检查通过；本次实物动作另行验收 |
 | 2026-11-01 | 已有操作者时允许明确 OK 接管，Friday 提交 [5961567](https://github.com/Geeprox/Friday/commit/5961567d3ed897eed20fb161be6dfa49d522df3d) | 107 项相关回归、源码及导出扫描通过，已重载本机识别服务；用户规则、允许范围、镜头配置及原开关保留，实物验收另行记录 |
+| 2026-11-01 | 修复上一条设备回报阻塞后续手势，Friday 提交 [7c0c6d6](https://github.com/Geeprox/Friday/commit/7c0c6d6f4096654eb873852f43013f3c8c26f874)，相关注释改为中文 [9a45a82](https://github.com/Geeprox/Friday/commit/9a45a82cbfac0c1820c8fa100ad6cb77b9c904c1) | 187 项相关回归与发布扫描通过；本机重载后原配置保留，使用者确认窗帘实际动作及页面新记录 |
 
 上述公开维护工具与详细教程已发布于用户手册仓库的提交 [`b5e0815`](https://github.com/lijunfeng722/friday-user-guide/commit/b5e0815a861248ba8365bed5f65facd05a395602)。原始诊断、账号、设备清单及备份保留在本机私有目录；公开说明只记录问题、处理方法和验证范围。
 

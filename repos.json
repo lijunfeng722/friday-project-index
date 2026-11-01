@@ -1,5 +1,5 @@
 {
-  "reviewed_on": "2026-10-31",
+  "reviewed_on": "2026-11-01",
   "guide_site": "https://lijunfeng722.github.io/friday-user-guide/",
   "repositories": [
     {
@@ -24,10 +24,10 @@
       "id": "user-guide",
       "name": "Friday 用户手册",
       "url": "https://github.com/lijunfeng722/friday-user-guide",
-      "role": "面向家庭使用者的图文手册与 GitHub Pages",
+      "role": "图文手册、GitHub Pages 与可下载的部署维护脚本",
       "kind": "独立文档",
       "deployment": "静态站点，不连接家庭账号或设备",
-      "required": "使用文档"
+      "required": "使用与部署维护"
     },
     {
       "id": "home-assistant",

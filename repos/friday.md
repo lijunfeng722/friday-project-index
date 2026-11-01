@@ -14,6 +14,8 @@
 
 已有环境的正常停止、重新启动、依赖升级与现场验收入口统一列在[部署维护总览](../docs/operations.md)。安装器的 Xiaomi Home v0.5.0 固定版本、来源校验及离线升级修复已推送到本仓库 `main`，提交为 [4ecf56c](https://github.com/Geeprox/Friday/commit/4ecf56c6a515f1fe1d6494e3632a2257490353ad)。用户手册仓库保留同内容下载副本与独立启停工具；使用时核对源码和工具版本。
 
+多人镜头中，另一人持续比 OK 不能接管已有操作者的问题已由 [5961567](https://github.com/Geeprox/Friday/commit/5961567d3ed897eed20fb161be6dfa49d522df3d)修复；107 项相关回归通过。用户手册安装基线已更新至该公开提交，具体选择与验证步骤见部署维护总览。
+
 ## 与其他仓库的关系
 
 参见[整体架构](../docs/architecture.md)，或[返回总索引](../README.md)。

@@ -1,0 +1,30 @@
+name: 服务启停脚本检查
+on:
+  push:
+    paths: ['*-friday.sh', 'friday-services.py', 'SHA256SUMS', 'FRIDAY-SCRIPT-LICENSE.txt', 'scripts/*service*.py', '.github/workflows/service-tools.yml']
+  pull_request:
+    paths: ['*-friday.sh', 'friday-services.py', 'SHA256SUMS', 'FRIDAY-SCRIPT-LICENSE.txt', 'scripts/*service*.py', '.github/workflows/service-tools.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lifecycle:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: 验证脚本与同步清单
+        run: |
+          sh -n start-friday.sh
+          sh -n stop-friday.sh
+          sh -n restart-friday.sh
+          python scripts/sync_service_tools.py --check
+          python scripts/test_service_distribution.py
+      - name: 用隔离进程验证启停
+        run: PYTHONDONTWRITEBYTECODE=1 python scripts/test_services.py --failfast

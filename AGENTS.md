@@ -1,17 +1,19 @@
 # 维护 Friday 项目索引
 
-先读 README.md、docs/maintenance.md 与 docs/development.md。元仓库维护仓库索引、公共开发规范与开发 Skill；产品代码和用户操作手册在各自仓库维护。
+先读 README.md、docs/maintenance.md 与 docs/development.md。元仓库维护仓库索引、根目录的日常启停工具、公共开发规范与开发 Skill；产品业务代码和用户操作手册在各自仓库维护。
 
 调整仓库关系时核对 repos.json、repos/、README 与架构文档。不要把当前机器路径、服务配置、凭据、家庭画面或原始运行日志写入公共文档。生成证据放在忽略的 .artifacts/。
 
 验证入口：`python3 scripts/check_index.py`、`python3 scripts/check_dev_policy.py check`。公共规则或检查器变化时，再运行 `python3 scripts/test_dev_policy.py`，同步已维护仓库并检查独立导出的公开内容。
+
+启停工具的源码在根目录，回归测试在 scripts/test_services.py；文档仓库仅维护同步生成的下载与测试副本。修改后运行隔离测试及 scripts/test_service_distribution.py，再用 scripts/sync_service_tools.py 同步并检查文档仓库。服务清单 services.local.json 属于忽略的本机私有配置，不纳入发布内容；仅整理脚本或目录时使用模拟运行验证入口，实际启停沿用用户授权范围。
 
 公共规范只在 docs/development.md 维护，技能源码集中在 `skills/friday-development/`；使用同步工具更新各仓库公共段和技能参考副本。协作说明统一用中文整合原有约束，保留必要的文件名、命令与技术术语。
 
 <!-- friday-dev-policy:start -->
 ## Friday 公共开发约定
 
-规范版本：2026-11-02.2
+规范版本：2026-11-02.3
 
 - 新增人工提交使用中文说明目的，推荐“功能：……”“修复：……”“文档：……”。保留英文技术名称；不为格式要求重写上游或已有历史。
 - 新增、修改的解释性注释和文档字符串使用中文。保留工具指令、协议字段、标准术语、第三方原文及用于反例的测试数据；不要求批量翻译旧注释。

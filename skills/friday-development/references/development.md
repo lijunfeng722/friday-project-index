@@ -7,7 +7,7 @@
 <!-- friday-policy-core:start -->
 ## Friday 公共开发约定
 
-规范版本：2026-11-02.2
+规范版本：2026-11-02.3
 
 - 新增人工提交使用中文说明目的，推荐“功能：……”“修复：……”“文档：……”。保留英文技术名称；不为格式要求重写上游或已有历史。
 - 新增、修改的解释性注释和文档字符串使用中文。保留工具指令、协议字段、标准术语、第三方原文及用于反例的测试数据；不要求批量翻译旧注释。
@@ -26,7 +26,7 @@
 | --- | --- |
 | Friday 产品行为、界面与设备能力 | [Friday](https://github.com/Geeprox/Friday)；用户可见变化同步[用户手册](https://github.com/lijunfeng722/friday-user-guide) |
 | 依赖安装器及其测试 | Friday 的安装器源码；同步用户手册的下载副本、对应 SHA256 清单和安装说明 |
-| 日常启停管理脚本 | 用户手册的 `docs/assets/scripts/`、测试与校验清单；部署入口变化时同步元仓库 |
+| 日常启动、停止和重启脚本 | 元仓库根目录的程序与校验清单、`scripts/` 中的测试和同步工具；同步用户手册的下载副本与说明 |
 | 架构、授权边界、协议或数据流 | Friday 对应技术文档；需要时更新 Mermaid 流程图、时序图或架构图 |
 | 跨仓库关系、依赖或维护入口 | [项目索引](https://github.com/lijunfeng722/project-index)的 README、仓库简介与架构、维护说明 |
 | 纯内部重构、测试整理或开发规范 | 在 PR 说明无用户文档影响及理由；更新受影响的开发文档即可 |
@@ -98,3 +98,5 @@ PR 模板要求分别填写用户文档、技术文档、顶级索引的影响�
 说明改动的仓库与用户行为、对应文档、实际验证、提交与推送状态。只有本次包含发布或部署时，才报告相应线上结果。设备控制效果单独记录使用者确认，保留未验证范围。
 
 维护和验收的现有入口见 [索引维护](https://github.com/lijunfeng722/project-index/blob/main/docs/maintenance.md)与[部署维护总览](https://github.com/lijunfeng722/project-index/blob/main/docs/operations.md)。
+
+日常启停工具在元仓库根目录维护，使用 `python3 scripts/sync_service_tools.py --guide ../friday-user-guide` 更新下载和测试副本，再运行同一命令加 `--check` 核对。源仓库运行 `python3 scripts/test_services.py` 与 `python3 scripts/test_service_distribution.py`；这些测试只使用临时进程和合成配置。服务清单继续保存在本机私有目录。

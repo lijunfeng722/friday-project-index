@@ -1,3 +1,7 @@
 .artifacts/
 __pycache__/
 .DS_Store
+/services.local.json
+/data/
+/.private/
+*.log

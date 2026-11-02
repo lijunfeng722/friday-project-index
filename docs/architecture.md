@@ -38,7 +38,17 @@ flowchart TB
 
 ## 部署维护代码的归属
 
-Friday 主仓维护依赖安装器和对应回归测试，用户手册仓库维护同内容下载副本及启停管理程序。工具在用户电脑执行；服务清单与账号保存在本机私有目录。元仓库维护跨仓库入口、版本及远端提交状态，具体脚本、启停顺序、升级原因和验收记录见[部署维护总览](operations.md)。
+Friday 主仓维护依赖安装器和对应回归测试。元仓库根目录维护日常启动、停止、重启入口及服务管理程序，scripts/ 维护隔离测试和下载同步工具。用户手册提供同内容下载副本及操作说明；程序在部署电脑执行，服务清单与账号保存在本机私有目录。具体文件、顺序、升级原因和验收记录见[部署维护总览](operations.md)。
+
+```mermaid
+flowchart LR
+  Source[project-index 根目录：启停源码] --> Sync[同步工具与校验清单]
+  Sync --> Download[friday-user-guide：下载副本]
+  Source --> Local[部署电脑上的启停程序]
+  Download --> Local
+  Private[本机私有服务清单] --> Local
+  Local --> Services[按登记顺序管理 Friday 与依赖]
+```
 
 ## 按层记录验收
 

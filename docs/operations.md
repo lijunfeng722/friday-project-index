@@ -9,11 +9,12 @@
 | Friday 应用、业务和本地视觉代码 | [Friday](https://github.com/Geeprox/Friday) | 产品 README 与部署文档 |
 | 安装教程、日常操作和常见问题 | [friday-user-guide 文档源码](https://github.com/lijunfeng722/friday-user-guide/tree/main/docs) | [在线用户手册](https://lijunfeng722.github.io/friday-user-guide/) |
 | 依赖安装器、离线升级与回归测试源码 | [Friday 安装器](https://github.com/Geeprox/Friday/blob/main/scripts/setup-dependencies.py)及[测试](https://github.com/Geeprox/Friday/blob/main/tests/test_dependency_upgrades.py) | Friday 自带安装器，用户手册提供同内容下载副本 |
-| 启停工具、安装器下载副本和校验清单 | [friday-user-guide 工具目录](https://github.com/lijunfeng722/friday-user-guide/tree/main/docs/assets/scripts) | 用户手册提供下载与校验步骤 |
+| 日常启停源码、校验清单与隔离测试 | [本元仓库根目录](../README.md#根目录启停入口)及 `scripts/` | 在根目录直接运行，也可使用文档站下载副本 |
+| 安装器与启停工具的下载副本 | [friday-user-guide 工具目录](https://github.com/lijunfeng722/friday-user-guide/tree/main/docs/assets/scripts) | 用户手册提供下载与校验步骤 |
 | 跨仓库关系、维护入口和版本说明 | 本元仓库 | [总索引](../README.md)、[架构](architecture.md)及本页 |
 | 本机服务清单、账号、规则、备份和原始诊断 | 自己部署环境的私有目录 | 由本机维护者管理，不提交到公开仓库 |
 
-**GitHub Pages 是文档与下载站点。** 启停脚本由你下载后在部署电脑执行，站点本身不连接家庭或运行服务。本元仓库引用产品源码与文档仓库的对应工具，说明它们的职责和版本关系。
+**GitHub Pages 是文档与下载站点。** 启停工具源码在本元仓库根目录维护，文档站提供同步副本；工具在部署电脑执行，站点本身不连接家庭或运行服务。依赖安装器继续由 Friday 主仓维护。
 
 安装器修复现已提交并推送到 **`Geeprox/Friday` 的 `main`**，公开提交为 [`4ecf56c`](https://github.com/Geeprox/Friday/commit/4ecf56c6a515f1fe1d6494e3632a2257490353ad)。提交包含安装器、回归测试和部署说明三个文件，基于原远端公开版本独立整理。该版本安装器与用户手册仓库已发布的下载副本内容一致。
 
@@ -35,14 +36,31 @@
 
 | 文件 | 职责 |
 | --- | --- |
-| [friday-services.py](https://github.com/lijunfeng722/friday-user-guide/blob/main/docs/assets/scripts/friday-services.py) | 读取本机服务清单，提供 `init`、`start`、`stop`、`restart`、`status`，按归属与就绪检查管理服务 |
-| [stop-friday.sh](https://github.com/lijunfeng722/friday-user-guide/blob/main/docs/assets/scripts/stop-friday.sh) | 请求正常停止，等待已登记服务与子进程收尾 |
-| [restart-friday.sh](https://github.com/lijunfeng722/friday-user-guide/blob/main/docs/assets/scripts/restart-friday.sh) | 正常停止后按依赖顺序重新启动 |
-| [SHA256SUMS](https://github.com/lijunfeng722/friday-user-guide/blob/main/docs/assets/scripts/SHA256SUMS) | 校验上述三个文件 |
+| [friday-services.py](../friday-services.py) | 读取本机服务清单，提供 `init`、`start`、`stop`、`restart`、`status`，按归属与就绪检查管理服务 |
+| [start-friday.sh](../start-friday.sh) | 启动尚未运行的服务；已运行的服务通过就绪检查后复用 |
+| [stop-friday.sh](../stop-friday.sh) | 请求正常停止，等待已登记服务与子进程收尾 |
+| [restart-friday.sh](../restart-friday.sh) | 正常停止后按依赖顺序重新启动 |
+| [SHA256SUMS](../SHA256SUMS) | 校验四个程序文件和原许可证 |
 | [setup-dependencies.py 源码](https://github.com/Geeprox/Friday/blob/main/scripts/setup-dependencies.py) / [下载副本](https://github.com/lijunfeng722/friday-user-guide/blob/main/docs/assets/scripts/setup-dependencies.py) | 固定依赖来源和版本，支持 Xiaomi Home 来源预取、首次安装和显式离线升级 |
 | [SETUP-SHA256SUMS](https://github.com/lijunfeng722/friday-user-guide/blob/main/docs/assets/scripts/SETUP-SHA256SUMS) | 校验依赖工具及其许可证 |
 
-先按[用户手册](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/#1-日常启动与停止)下载、校验并初始化自己的 `services.local.json`。已有交付包时直接使用原配置；macOS 的“优雅停止.command”“重新启动.command”可以调用同一管理程序。
+### 在元仓库根目录使用
+
+克隆本元仓库后，根目录已包含三个 Shell 入口和管理程序。先校验 `SHA256SUMS`：macOS 使用 `shasum -a 256 -c SHA256SUMS`，Linux 使用 `sha256sum -c SHA256SUMS`。
+
+已有部署清单时，指向自己的原文件，例如：
+
+```sh
+export FRIDAY_SERVICE_CONFIG="$HOME/friday-home/service-tools/services.local.json"
+export FRIDAY_PYTHON="$HOME/friday-home/Friday/.venv/bin/python"
+./start-friday.sh --dry-run
+```
+
+确认计划后，按需要选择 `./start-friday.sh`、`./stop-friday.sh` 或 `./restart-friday.sh`。也可以在根目录保存自己的 `services.local.json`，该文件已被 Git 忽略；不要覆盖既有清单或重新初始化账号。
+
+尚未有服务清单时，先按[用户手册](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/#1-日常启动与停止)初始化，并显式指定 Friday 安装目录。脚本来源可以选择元仓库或下载包，已有配置均可继续复用；macOS 的“优雅停止.command”“重新启动.command”可以调用同一管理程序。
+
+### 下载包使用方式
 
 对于按教程准备的通用目录，先在部署电脑进入脚本目录。Linux 使用 Docker sudo 时先 `sudo -v`，macOS 先确认原 Colima 实例可用。
 
@@ -173,4 +191,6 @@ Friday [7c0c6d6](https://github.com/Geeprox/Friday/commit/7c0c6d6f4096654eb87385
 
 上述公开维护工具与详细教程已发布于用户手册仓库的提交 [`b5e0815`](https://github.com/lijunfeng722/friday-user-guide/commit/b5e0815a861248ba8365bed5f65facd05a395602)。原始诊断、账号、设备清单及备份保留在本机私有目录；公开说明只记录问题、处理方法和验证范围。
 
-后续修改安装器时，同步 Friday 源码、文档仓库的下载副本和校验清单、用户教程以及本站的提交状态与入口；更新要求见[维护索引](maintenance.md)。
+上述记录保留迁移前的修复提交和现场验收范围。当前日常启停源码已集中到元仓库根目录，新增启动入口；同步工具生成用户手册的下载与测试副本，原有停止、重启和设备就绪逻辑保留。
+
+后续修改安装器时，同步 Friday 源码及下载副本；修改日常启停工具时，以本仓库为源运行 `python3 scripts/sync_service_tools.py --guide ../friday-user-guide`，再加 `--check` 核对。两类变更都应同步用户教程、校验清单和维护入口；更新要求见[维护索引](maintenance.md)。

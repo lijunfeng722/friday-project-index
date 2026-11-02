@@ -17,11 +17,13 @@
 
 ## 部署或维护工具更新后
 
-1. 安装器修改提交到 Friday 主仓，同步 `friday-user-guide/docs/assets/scripts/` 的下载副本和对应 SHA256 清单；启停工具继续在文档仓库维护，保留许可证。
+1. 安装器修改提交到 Friday 主仓，同步 `friday-user-guide/docs/assets/scripts/` 的下载副本和对应 SHA256 清单。日常启停工具在本元仓库根目录维护，保留原许可证；通过 `python3 scripts/sync_service_tools.py --guide ../friday-user-guide` 更新文档站的下载和测试副本，再加 `--check` 核对一致性。
 2. 同步用户手册的安装、启停、升级和常见问题，确认公开源码链接与 Pages 下载内容一致。
 3. 在本仓库的[部署维护总览](operations.md)同步版本、依赖升级原因、操作入口和验证范围，并在 README 保留易发现的入口。
 4. 相关职责变化时更新 `repos.json`、对应 `repos/` 简介和架构说明；分别记录本机修改、已推送提交与上游发布状态，补上可公开访问的提交和分支链接。
 5. 提交前运行 `python3 scripts/check_index.py`，核对公开链接，不纳入私有配置、凭据、家庭截图、备份或原始日志。
+
+启停工具修改后运行 `python3 scripts/test_services.py`、`python3 scripts/test_service_distribution.py`，以及三个 Shell 入口的 `sh -n`。元仓库 CI 在 macOS / Linux 上执行隔离测试；文档站继续验证实际下载包、SHA256 清单和文档构建。不要直接在下载副本中独立修改程序，也不要为检查目录迁移而操作真实设备。
 
 ## 变更说明要包含什么
 

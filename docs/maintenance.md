@@ -33,4 +33,4 @@
 
 修改规范后更新版本，运行 `python3 scripts/test_dev_policy.py`，按开发规范示例执行 `sync` 与 `sync --check`，再分别提交受影响仓库。元仓库运行 `python3 scripts/check_index.py` 与 `python3 scripts/check_dev_policy.py check`；用户手册与 Friday 仍保留各自原有验证入口。
 
-技能源码在 `.agents/skills/friday-development/`。本机安装或链接整个目录后核对技能发现；不要把某台电脑的个人技能路径、运行配置或安装状态写入公共 Skill。检查器只验证可机械判断的项目，文档影响、注释质量与实物效果保留对应审查和验收。
+技能源码集中维护在 `skills/friday-development/`。本机安装或链接整个目录后核对技能发现，迁移目录时同步修正安装链接、生成器和引用。各仓库的 AGENTS.md 用中文整合原有约束和公共约定，避免保留两段语言不同、内容重复的规则。不要把某台电脑的个人技能路径、运行配置或安装状态写入公共 Skill；检查器只验证可机械判断的项目，文档影响、注释质量与实物效果保留对应审查和验收。

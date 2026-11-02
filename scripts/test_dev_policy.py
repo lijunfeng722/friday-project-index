@@ -25,7 +25,7 @@ class PolicyTests(unittest.TestCase):
         self.make_repo(self.source, policy.SOURCE)
         self.make_repo(self.target, "https://github.com/Geeprox/Friday")
         files = ["docs/development.md", "repos.json", *policy.SIGNATURES,
-                 ".agents/skills/friday-development/SKILL.md"]
+                 "skills/friday-development/SKILL.md"]
         for name in files:
             target = self.source / name
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -93,7 +93,7 @@ class PolicyTests(unittest.TestCase):
 
     def test_shared_rules_and_checker_drift_are_detected(self):
         agents = self.target / "AGENTS.md"
-        agents.write_text(agents.read_text().replace("规范版本：2026-11-02.1", "规范版本：0"))
+        agents.write_text(agents.read_text().replace(policy.START, policy.START + "\n规则已偏离同步版本。", 1))
         self.assertIn("agents_shared_rules_drift", policy.check_repo(self.target)["errors"])
         checker = self.target / policy.CHECKER
         checker.write_text(checker.read_text() + "\n# 本地意外修改\n")

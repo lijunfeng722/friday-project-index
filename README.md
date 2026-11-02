@@ -5,6 +5,7 @@
 - **想使用产品**：先读 [Friday 用户手册](https://lijunfeng722.github.io/friday-user-guide/)。
 - **想部署、停止或重新启动服务**：查看[部署、启停与升级总览](docs/operations.md)，从这里找到操作步骤、脚本源码和验收说明。
 - **想维护代码或部署**：从下表进入对应仓库，再看[整体架构](docs/architecture.md)。
+- **准备开发、修复或维护文档**：阅读[开发规范](docs/development.md)与 [CONTRIBUTING.md](CONTRIBUTING.md)，使用各仓库的 `AGENTS.md` 或 Friday 开发 Skill。
 - **想更新索引**：按[维护方式](docs/maintenance.md)核对来源、关系与链接。
 
 ## 仓库索引
@@ -59,13 +60,18 @@ flowchart LR
 ```text
 project-index/
 ├── README.md
+├── AGENTS.md              # 本仓库入口与公共开发约定
+├── CONTRIBUTING.md        # 开发协作入口
 ├── repos.json
+├── .agents/skills/friday-development/ # 可安装的开发 Skill 与规范副本
+├── .github/               # PR 模板、固定约定快照和检查工作流
 ├── repos/                 # 每个仓库一页简介
 ├── docs/
 │   ├── architecture.md    # 整体关系与部署边界
 │   ├── operations.md      # 部署、启停、升级与验收入口
-│   └── maintenance.md     # 怎样保持索引正确
-└── scripts/check_index.py
+│   ├── maintenance.md     # 怎样保持索引正确
+│   └── development.md     # 公共开发规范的维护源
+└── scripts/               # 索引检查、规范同步与对应测试
 ```
 
 索引核对日期：**2026-11-01**。上游版本和支持范围以各原仓库及其官方说明为准；本索引不代表每一项能力均已完成现场验收。

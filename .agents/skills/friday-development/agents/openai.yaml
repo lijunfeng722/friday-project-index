@@ -1,0 +1,4 @@
+interface:
+  display_name: "Friday 开发协作"
+  short_description: "跨仓库完成 Friday 开发、验证、文档同步与授权范围内的交付"
+  default_prompt: "使用 $friday-development 完成这项 Friday 开发任务，并同步受影响的文档与验证结果。"

@@ -26,3 +26,11 @@
 ## 变更说明要包含什么
 
 说明哪个仓库变了、用户行为怎样变化、依赖关系是否改变，以及文档验证范围。源码版本、服务健康与物理验收结果分别说明，不用一次软件回归代替现场确认。
+
+## 开发规范与 Skill 更新后
+
+公共规范在 [development.md](development.md)维护，三个受维护仓库各有自己的 AGENTS.md。公共约定、检查器、PR 模板和工作流通过显式同步生成，技能的完整规范副本也由同一工具更新。
+
+修改规范后更新版本，运行 `python3 scripts/test_dev_policy.py`，按开发规范示例执行 `sync` 与 `sync --check`，再分别提交受影响仓库。元仓库运行 `python3 scripts/check_index.py` 与 `python3 scripts/check_dev_policy.py check`；用户手册与 Friday 仍保留各自原有验证入口。
+
+技能源码在 `.agents/skills/friday-development/`。本机安装或链接整个目录后核对技能发现；不要把某台电脑的个人技能路径、运行配置或安装状态写入公共 Skill。检查器只验证可机械判断的项目，文档影响、注释质量与实物效果保留对应审查和验收。

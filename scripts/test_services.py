@@ -108,7 +108,26 @@ class LifecycleTests(unittest.TestCase):
     def call(self, action, success=True):
         result = subprocess.run([sys.executable, str(RUNNER), action, "--config", str(self.config)],
                                 capture_output=True, text=True, timeout=20)
-        self.assertEqual(result.returncode, 0 if success else 1, result.stdout + result.stderr)
+        message = result.stdout + result.stderr
+        if result.returncode != (0 if success else 1):
+            # 失败时只报告合成进程的判断结果，不输出命令、路径或环境中的凭据。
+            diagnostic = {"fixture_pid_recorded": False}
+            path = self.root / "friday.pid"
+            if path.is_file():
+                diagnostic["fixture_pid_recorded"] = True
+                entry = lifecycle.identity(int(path.read_text()))
+                diagnostic["identity_available"] = entry is not None
+                if entry:
+                    cwd = lifecycle.process_cwd(entry["pid"])
+                    diagnostic["command_markers_match"] = all(x in entry["command"] for x in self.service["command_contains"])
+                    diagnostic["cwd_probe_available"] = cwd is not None
+                    diagnostic["cwd_matches"] = cwd == str(self.root)
+                booted = lifecycle.boot_time()
+                diagnostic["pid_record_before_kernel_boot"] = booted is not None and path.stat().st_mtime < booted
+                diagnostic["kernel_boot_after_wall_clock"] = booted is not None and booted > time.time() + 1
+                diagnostic["http_ready"] = lifecycle.Runner(json.loads(self.config.read_text())).ready(self.service)
+            message += "\n" + json.dumps(diagnostic)
+        self.assertEqual(result.returncode, 0 if success else 1, message)
         return result
 
     def tearDown(self):

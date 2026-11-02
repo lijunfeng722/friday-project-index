@@ -26,7 +26,7 @@ lifecycle = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(lifecycle)
 
 FIXTURE = r'''
-import argparse, json, os, signal, subprocess, sys, time
+import argparse, json, os, signal, socket, subprocess, sys, time
 from pathlib import Path
 from http.server import BaseHTTPRequestHandler, HTTPServer
 p=argparse.ArgumentParser(); p.add_argument('role'); p.add_argument('directory'); p.add_argument('port',type=int); p.add_argument('--ignore-term',action='store_true'); a=p.parse_args()
@@ -49,7 +49,11 @@ class Handler(BaseHTTPRequestHandler):
   value=json.loads(payload.read_text()).get(self.path,{}) if payload.exists() else {'ready':True}
   self.send_response(200); self.end_headers(); self.wfile.write(json.dumps(value).encode())
  def log_message(self,*_): pass
+# 合成服务固定使用回环地址，不依赖云端主机的反向域名解析。
+socket.getfqdn=lambda _name='': 'localhost'
+(d/'fixture-stage').write_text('binding')
 server=HTTPServer(('127.0.0.1',a.port),Handler); server.timeout=.1
+(d/'fixture-stage').write_text('serving')
 while not stopping: server.handle_request()
 server.server_close(); child.send_signal(signal.SIGTERM)
 (d/'parent-cleanup').write_text('complete')
@@ -126,6 +130,17 @@ class LifecycleTests(unittest.TestCase):
                 diagnostic["pid_record_before_kernel_boot"] = booted is not None and path.stat().st_mtime < booted
                 diagnostic["kernel_boot_after_wall_clock"] = booted is not None and booted > time.time() + 1
                 diagnostic["http_ready"] = lifecycle.Runner(json.loads(self.config.read_text())).ready(self.service)
+                diagnostic["fixture_port_open"] = lifecycle.port_open(self.service["listen"])
+                stage = self.root / "fixture-stage"
+                diagnostic["fixture_serving"] = stage.is_file() and stage.read_text() == "serving"
+                try:
+                    opener = lifecycle.urllib.request.build_opener(lifecycle.urllib.request.ProxyHandler({}))
+                    with opener.open(self.service["ready"]["url"], timeout=2) as response:
+                        diagnostic["http_status"] = response.status
+                except Exception as error:
+                    diagnostic["http_failure_kind"] = type(error).__name__
+                    if hasattr(error, "reason"):
+                        diagnostic["http_reason_kind"] = type(error.reason).__name__
             message += "\n" + json.dumps(diagnostic)
         self.assertEqual(result.returncode, 0 if success else 1, message)
         return result

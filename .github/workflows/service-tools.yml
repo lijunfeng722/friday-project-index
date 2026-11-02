@@ -27,4 +27,4 @@ jobs:
           python scripts/sync_service_tools.py --check
           python scripts/test_service_distribution.py
       - name: 用隔离进程验证启停
-        run: PYTHONDONTWRITEBYTECODE=1 python scripts/test_services.py
+        run: PYTHONDONTWRITEBYTECODE=1 python scripts/test_services.py --failfast

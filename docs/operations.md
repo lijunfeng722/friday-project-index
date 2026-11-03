@@ -28,7 +28,8 @@
 | 全新 Linux 安装 | [准备工具、Docker 和 Friday](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-linux/) |
 | HA 与 Xiaomi Home | [设备接入目的、安装、账号授权与设备导入](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-home-assistant/) |
 | 可选摄像头和本地识别 | [Miloco、视觉依赖及配置边界](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-camera/) |
-| 已部署环境的停止、重启与状态检查 | [维护章节](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/) |
+| 已部署环境的启动、停止与重启 | [日常维护](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/) |
+| 脚本首次配置、状态检查、升级与备份 | [安装人员参考](https://lijunfeng722.github.io/friday-user-guide/maintenance/installation-maintenance/) |
 
 已有 HA 时复用原实例。Xiaomi Home 安装在 HA 内，随 HA 启停；Miloco、插件宿主、ARL 与视觉环境按实际使用情况分别准备。
 
@@ -58,7 +59,7 @@ export FRIDAY_PYTHON="$HOME/friday-home/Friday/.venv/bin/python"
 
 确认计划后，按需要选择 `./start-friday.sh`、`./stop-friday.sh` 或 `./restart-friday.sh`。也可以在根目录保存自己的 `services.local.json`，该文件已被 Git 忽略；不要覆盖既有清单或重新初始化账号。
 
-尚未有服务清单时，先按[用户手册](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/#1-日常启动与停止)初始化，并显式指定 Friday 安装目录。脚本来源可以选择元仓库或下载包，已有配置均可继续复用；macOS 的“优雅停止.command”“重新启动.command”可以调用同一管理程序。
+尚未有服务清单时，先按[安装人员参考](https://lijunfeng722.github.io/friday-user-guide/maintenance/installation-maintenance/#1-日常启动与停止)初始化，并显式指定 Friday 安装目录。脚本来源可以选择元仓库或下载包，已有配置均可继续复用；macOS 的“优雅停止.command”“重新启动.command”可以调用同一管理程序。
 
 ### 下载包使用方式
 
@@ -113,7 +114,7 @@ flowchart TD
 
 旧管理程序曾在整机重启后遇到 `pid_identity_mismatch`：上次开机保存的进程编号已被其他程序复用，身份保护检查因此拒绝继续。此问题已在用户手册仓库的提交 [d29b24c](https://github.com/lijunfeng722/friday-user-guide/commit/d29b24c86dc4ded92098489cf18bedecf5c2a179)修复。管理程序读取内核开机时间，跳过开机前写入的旧记录；本次开机的身份不符或无法读取开机时间时，仍保留原保护检查。
 
-更新管理脚本及其 SHA256 清单，保留自己的 `services.local.json` 后再使用原入口。具体下载与操作见[用户手册的重新开机说明](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/#电脑重新开机后)。不需要重新初始化账号或按旧编号手动结束其他程序。
+更新管理脚本及其 SHA256 清单，保留自己的 `services.local.json` 后再使用原入口。具体下载与操作见[安装人员参考的重新开机说明](https://lijunfeng722.github.io/friday-user-guide/maintenance/installation-maintenance/#电脑重新开机后)。不需要重新初始化账号或按旧编号手动结束其他程序。
 
 本轮 macOS 实际恢复已返回 `restart_complete`，各项服务、真实家庭来源、摄像头及启用规则的目标状态检查通过，原规则、控制范围和开关保留；macOS / 隔离 Linux 各 18 项检查通过。本次恢复后的设备实物动作由使用者另行确认。
 
@@ -123,7 +124,7 @@ flowchart TD
 
 管理程序已通过用户手册仓库的 [cb0043b](https://github.com/lijunfeng722/friday-user-guide/commit/cb0043bd3a259809d5f3da8fe38658cfd78447cb)修复：服务配置包含独立就绪检查时继续有限等待，只有运行状态与就绪检查同时通过，才启动后续服务；不重复发送启动命令。没有独立就绪检查、进程未运行或健康检查一直失败时，仍报告失败并保留后续服务停止状态。原 PID 归属、正常停止、子进程收尾和设备就绪检查继续使用。
 
-macOS 与隔离 Linux 各 21 项检查通过。本机使用修正后的原重启入口重新上线，保留既有账号、三条规则、控制范围与原开关；使用者随后确认窗帘实际动作、页面出现新记录，本次既有窗帘手势规则的整机重启后实体验收通过。更新[管理脚本与校验清单](https://github.com/lijunfeng722/friday-user-guide/tree/main/docs/assets/scripts)时保留自己的服务清单，操作见[用户手册](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/#miloco-启动较慢时怎么办)。
+macOS 与隔离 Linux 各 21 项检查通过。本机使用修正后的原重启入口重新上线，保留既有账号、三条规则、控制范围与原开关；使用者随后确认窗帘实际动作、页面出现新记录，本次既有窗帘手势规则的整机重启后实体验收通过。更新[管理脚本与校验清单](https://github.com/lijunfeng722/friday-user-guide/tree/main/docs/assets/scripts)时保留自己的服务清单，操作见[安装人员参考](https://lijunfeng722.github.io/friday-user-guide/maintenance/installation-maintenance/#miloco-启动较慢时怎么办)。
 
 ## 多人镜头中的操作者选择
 
@@ -149,7 +150,7 @@ Friday [7c0c6d6](https://github.com/Geeprox/Friday/commit/7c0c6d6f4096654eb87385
 
 旧版 v0.4.3 的云设备刷新在网络请求异常后可能没有安排重试，使设备状态持续不可用。官方 [PR #1555](https://github.com/XiaoMi/ha_xiaomi_home/pull/1555)补上异常后的重试，并随 [v0.4.6](https://github.com/XiaoMi/ha_xiaomi_home/releases/tag/v0.4.6)发布；本次采用的 [v0.5.0](https://github.com/XiaoMi/ha_xiaomi_home/releases/tag/v0.5.0)包含该修复。最初网络重置的来源仍未确定。
 
-已有集成按[完整升级步骤](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/#已有-xiaomi-home-怎样升级)操作：
+已有集成按[完整升级步骤](https://lijunfeng722.github.io/friday-user-guide/maintenance/installation-maintenance/#已有-xiaomi-home-怎样升级)操作：
 
 1. 暂停互动，核对原 HA 容器和配置目录，提前下载并校验集成来源。
 2. 正常停止同一套服务，在停止状态备份完整 HA 配置（含 `.storage`）和 Friday 私有设置。
@@ -172,7 +173,7 @@ Friday [7c0c6d6](https://github.com/Geeprox/Friday/commit/7c0c6d6f4096654eb87385
 
 管理程序在 `ready` 配置中启用 `verify_saved_gestures: true` 时，会检查当前启用手势规则的绑定设备。目标只出现在设备列表里不能通过检查；不可用或过期时继续等待，超时报告未就绪。已暂停的互动保留暂停设置，上线后的现场验收仍需按需完成。
 
-如果已有手势响应却设备没动，先看 HA 中目标是否“不可用”，再检查 Xiaomi Home 连接和日志。网络恢复后可以重新加载原集成，再核对状态；具体入口见[重启后设备连接排查](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-maintenance/#重启后有手势记录设备却没动)。
+如果已有手势响应却设备没动，先看 HA 中目标是否“不可用”，再检查 Xiaomi Home 连接和日志。网络恢复后可以重新加载原集成，再核对状态；具体入口见[重启后设备连接排查](https://lijunfeng722.github.io/friday-user-guide/maintenance/installation-maintenance/#重启后有手势记录设备却没动)。
 
 ## 本轮维护与验收记录
 

@@ -270,20 +270,30 @@ def event_checks(root, event):
     before, after = event.get("before"), event["after"]
     if not isinstance(before, str) or not SHA.fullmatch(before) or not isinstance(after, str) or not SHA.fullmatch(after):
         raise PolicyError("event_commit_scope_invalid")
-    if set(before) == {"0"}:
-        # 新分支不回扫已有历史；优先取默认分支的共同祖先，首次导入只检查当前提交。
-        branch = event.get("repository", {}).get("default_branch", "")
-        if not isinstance(branch, str) or not re.fullmatch(r"[A-Za-z0-9_./-]+", branch) or branch.startswith("-"):
-            raise PolicyError("event_default_branch_invalid")
-        ref = "refs/remotes/origin/" + branch
+    branch = event.get("repository", {}).get("default_branch", "")
+    if not isinstance(branch, str) or not re.fullmatch(r"[A-Za-z0-9_./-]+", branch) or branch.startswith("-"):
+        raise PolicyError("event_default_branch_invalid")
+    ref = "refs/remotes/origin/" + branch
+
+    def default_branch_baseline():
         try:
-            before = git(root, "merge-base", after, ref)
+            baseline = git(root, "merge-base", after, ref)
         except PolicyError:
             if event.get("ref") != "refs/heads/" + branch:
                 raise PolicyError("new_branch_baseline_unavailable") from None
-            before = None
-        if before == after:
-            before = None
+            return None
+        return None if baseline == after else baseline
+
+    if set(before) == {"0"}:
+        # 新分支不回扫已有历史；优先取默认分支的共同祖先，首次导入只检查当前提交。
+        before = default_branch_baseline()
+    else:
+        # 强推可能使旧 tip 不再可用，或新 tip 不再以旧 tip 为祖先。
+        try:
+            if git(root, "merge-base", before, after) != before:
+                before = default_branch_baseline()
+        except PolicyError:
+            before = default_branch_baseline()
     return commit_language_errors(root, before, after)
 
 

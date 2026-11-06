@@ -201,6 +201,15 @@ class PolicyTests(unittest.TestCase):
         self.assertFalse(report["errors"])
         self.assertEqual(report["checked_commits"], 1)
 
+    def test_push_with_unavailable_before_uses_default_branch_baseline(self):
+        baseline = self.commit("existing upstream history")
+        self.command(self.target, "update-ref", "refs/remotes/origin/main", baseline)
+        head = self.commit("功能：压缩后的提交")
+        report = policy.event_checks(self.target, {"before": "f" * 40, "after": head,
+                  "ref": "refs/heads/feature", "repository": {"default_branch": "main"}})
+        self.assertFalse(report["errors"])
+        self.assertEqual(report["checked_commits"], 1)
+
     def test_first_import_does_not_rescan_history_and_unknown_scope_is_refused(self):
         self.commit("existing imported history")
         head = self.commit("维护：首次接入规则")

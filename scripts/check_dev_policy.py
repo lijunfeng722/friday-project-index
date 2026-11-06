@@ -33,7 +33,8 @@ git_reference_or_query_unavailable shared_rules_markers_invalid run_sync_from_pr
 target_must_be_repository_root target_repository_not_managed generated_path_is_symlink
 existing_file_is_not_managed existing_snapshot_is_not_managed policy_schema_invalid
 shared_rules_digest_invalid commit_head_invalid commit_base_invalid event_commit_scope_invalid
-event_default_branch_invalid new_branch_baseline_unavailable""".split())
+event_default_branch_invalid event_commit_scope_unavailable
+new_branch_baseline_unavailable""".split())
 
 
 class PolicyError(ValueError):

@@ -290,10 +290,11 @@ def event_checks(root, event):
     else:
         # 强推可能使旧 tip 不再可用，或新 tip 不再以旧 tip 为祖先。
         try:
-            if git(root, "merge-base", before, after) != before:
-                before = default_branch_baseline()
+            git(root, "rev-parse", "--verify", "--end-of-options", before + "^{commit}")
         except PolicyError:
             before = default_branch_baseline()
+            if before is None:
+                raise PolicyError("event_commit_scope_unavailable") from None
     return commit_language_errors(root, before, after)
 
 

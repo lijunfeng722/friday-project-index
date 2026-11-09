@@ -42,7 +42,7 @@ Friday 主仓维护依赖安装器和对应回归测试。元仓库根目录维�
 
 ```mermaid
 flowchart LR
-  Source[project-index 根目录：启停源码] --> Sync[同步工具与校验清单]
+  Source[friday-project-index 根目录：启停源码] --> Sync[同步工具与校验清单]
   Sync --> Download[friday-user-guide：下载副本]
   Source --> Local[部署电脑上的启停程序]
   Download --> Local

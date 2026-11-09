@@ -191,6 +191,68 @@ class PolicyTests(unittest.TestCase):
         event["pull_request"]["user"]["type"] = "Bot"
         self.assertFalse(policy.event_checks(self.target, event)["errors"])
 
+    def test_missing_before_push_keeps_unpushed_history_out_of_scope(self):
+        self.commit("historical upstream baseline")
+        first = self.commit("功能：新增检查入口")
+        head = self.commit("修复：保留推送校验结果")
+        event = {"before": "f" * 40, "after": head,
+                 "commits": [{"id": first}, {"id": head}]}
+        self.assertEqual(policy.event_checks(self.target, event),
+                         {"checked_commits": 2, "exempt_commits": 0, "errors": []})
+
+    def test_missing_before_push_rejects_english_commit(self):
+        self.commit("historical upstream baseline")
+        private = "SYNTHETIC_PRIVATE_MARKER"
+        head = self.commit(private)
+        event = {"before": "f" * 40, "after": head, "commits": [{"id": head}]}
+        report = policy.event_checks(self.target, event)
+        self.assertEqual(report["checked_commits"], 1)
+        self.assertEqual(report["errors"], ["commit_subject_requires_chinese:" + head[:12]])
+        self.assertNotIn(private, json.dumps(report))
+
+    def test_missing_before_push_skips_merged_upstream_commits(self):
+        baseline = self.commit("historical upstream baseline")
+        local = self.commit("功能：新增检查入口")
+        self.command(self.target, "checkout", "-b", "upstream", baseline)
+        upstream = self.commit("upstream implementation")
+        self.command(self.target, "checkout", "main")
+        self.command(self.target, "merge", "--no-ff", "upstream", "-m", "Merge upstream")
+        head = self.command(self.target, "rev-parse", "HEAD")
+        event = {"before": "f" * 40, "after": head,
+                 "commits": [{"id": local}, {"id": upstream}, {"id": head}]}
+        self.assertEqual(policy.event_checks(self.target, event),
+                         {"checked_commits": 1, "exempt_commits": 1, "errors": []})
+
+    def test_missing_before_push_rejects_invalid_commit_lists(self):
+        baseline = self.commit("历史基线")
+        head = self.commit("测试：校验推送提交清单")
+        cases = [
+            ("missing", {}),
+            ("null", {"commits": None}),
+            ("not_list", {"commits": {"id": head}}),
+            ("empty", {"commits": []}),
+            ("not_object", {"commits": [head]}),
+            ("missing_id", {"commits": [{}]}),
+            ("invalid_id", {"commits": [{"id": "not-a-commit"}]}),
+            ("duplicate", {"commits": [{"id": head}, {"id": head}]}),
+            ("missing_head", {"commits": [{"id": baseline}]}),
+        ]
+        for label, payload in cases:
+            with self.subTest(label=label):
+                event = {"before": "f" * 40, "after": head, **payload}
+                with self.assertRaisesRegex(policy.PolicyError, "^event_commit_scope_invalid$"):
+                    policy.event_checks(self.target, event)
+
+    def test_missing_before_push_rejects_truncated_commit_lists(self):
+        head = self.commit("测试：校验推送事件大小")
+        for size in (2048, 2049):
+            with self.subTest(size=size):
+                # 标识格式合法且互不重复，单独验证截断上限检查。
+                commits = [{"id": head}, *({"id": f"{number:040x}"} for number in range(size - 1))]
+                event = {"before": "f" * 40, "after": head, "commits": commits}
+                with self.assertRaisesRegex(policy.PolicyError, "^event_commit_scope_invalid$"):
+                    policy.event_checks(self.target, event)
+
     def test_new_branch_uses_default_branch_baseline(self):
         baseline = self.commit("existing upstream history")
         self.command(self.target, "update-ref", "refs/remotes/origin/main", baseline)

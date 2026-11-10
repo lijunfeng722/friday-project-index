@@ -1,12 +1,12 @@
 {
-  "reviewed_on": "2026-11-01",
+  "reviewed_on": "2026-11-11",
   "guide_site": "https://lijunfeng722.github.io/friday-user-guide/",
   "repositories": [
     {
       "id": "friday",
       "name": "Friday",
       "url": "https://github.com/Geeprox/Friday",
-      "role": "家庭产品主仓：Web 界面、设备操作、手势、回看与原生组件",
+      "role": "家庭产品主仓：设备、手势、回看、KTV 与可选 ARL/API 智能通道",
       "kind": "主项目",
       "deployment": "独立运行；本地视觉属于本仓库，不是 Miloco 内置手势",
       "required": "核心"

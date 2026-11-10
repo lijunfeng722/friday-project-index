@@ -25,7 +25,7 @@
 
 | 仓库 | 职责 | 类型 | 使用关系 | 详细说明 |
 | --- | --- | --- | --- | --- |
-| [Friday](https://github.com/Geeprox/Friday) | 家庭产品主仓：Web 界面、设备操作、手势、回看与原生组件 | 主项目 | 核心 | [简介](repos/friday.md) |
+| [Friday](https://github.com/Geeprox/Friday) | 家庭产品主仓：设备、手势、回看、KTV 与可选 ARL/API 智能通道 | 主项目 | 核心 | [简介](repos/friday.md) |
 | [ARL](https://github.com/Geeprox/ARL) | 共享智能运行服务与原生管理界面 | 相关项目 | 智能能力按需 | [简介](repos/arl.md) |
 | [Friday 用户手册](https://github.com/lijunfeng722/friday-user-guide) | 图文手册、GitHub Pages 与部署维护脚本下载副本 | 独立文档 | 使用与部署维护 | [简介](repos/user-guide.md) |
 | [Home Assistant Core](https://github.com/home-assistant/core) | 家庭房间、设备、状态和服务的统一接入 | 外部依赖 | 真实家庭接入 | [简介](repos/home-assistant.md) |
@@ -38,6 +38,8 @@
 **Xiaomi Home 集成装在 Home Assistant 内部。** Miloco、ARL 与 OpenClaw 有各自的服务职责；并不是为了打开 Friday 就必须启动所有可选功能。
 
 Friday 的人体和手势代码位于 Friday 仓库。Miloco 能播放摄像头视频，不等于 Friday 的本地识别环境已经准备好。图文手册单独维护，站点提供文档、示例截图与维护脚本下载。
+
+Friday 的文字智能可选 ARL · Codex 或自己的 OpenAI API；图片和主动语音各有独立开关。API 用量闸门、降级与 KTV 逐曲背景属于 Friday，OpenAI 是可选外部服务，不是新增仓库或本地必装服务。配置方式见[智能服务与每日上限](https://lijunfeng722.github.io/friday-user-guide/guides/intelligence/)。
 
 ## 部署与维护入口
 
@@ -63,6 +65,7 @@ flowchart LR
   F --> H[Home Assistant Core]
   H --> X[ha_xiaomi_home 集成]
   F -. 可选智能任务 .-> A[ARL]
+  F -. 独立配置与每日上限 .-> P[OpenAI API]
   F --> V[Friday 仓库内的本地视觉]
   M[xiaomi-miloco] -. 授权与摄像头相关配合 .-> V
   O[OpenClaw] -. 本次 Miloco 插件宿主 .-> M
@@ -94,4 +97,4 @@ project-index/
 └── scripts/               # 索引检查、规范/下载同步及隔离测试
 ```
 
-索引核对日期：**2026-11-01**。上游版本和支持范围以各原仓库及其官方说明为准；本索引不代表每一项能力均已完成现场验收。
+索引核对日期：**2026-11-11**。本次更新智能通道、降级与 KTV 背景的职责关系；其他现场验收仍按原记录。上游版本和支持范围以各原仓库及其官方说明为准。

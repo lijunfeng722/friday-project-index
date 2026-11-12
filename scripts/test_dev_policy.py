@@ -191,6 +191,116 @@ class PolicyTests(unittest.TestCase):
         event["pull_request"]["user"]["type"] = "Bot"
         self.assertFalse(policy.event_checks(self.target, event)["errors"])
 
+    def test_missing_before_push_keeps_unpushed_history_out_of_scope(self):
+        self.commit("historical upstream baseline")
+        first = self.commit("功能：新增检查入口")
+        head = self.commit("修复：保留推送校验结果")
+        event = {"before": "f" * 40, "after": head,
+                 "commits": [{"id": first}, {"id": head}]}
+        self.assertEqual(policy.event_checks(self.target, event),
+                         {"checked_commits": 2, "exempt_commits": 0, "errors": []})
+
+    def test_missing_before_push_rejects_english_commit(self):
+        self.commit("historical upstream baseline")
+        private = "SYNTHETIC_PRIVATE_MARKER"
+        head = self.commit(private)
+        event = {"before": "f" * 40, "after": head, "commits": [{"id": head}]}
+        report = policy.event_checks(self.target, event)
+        self.assertEqual(report["checked_commits"], 1)
+        self.assertEqual(report["errors"], ["commit_subject_requires_chinese:" + head[:12]])
+        self.assertNotIn(private, json.dumps(report))
+
+    def test_missing_before_push_rejects_gaps_in_first_parent_scope(self):
+        self.commit("historical upstream baseline")
+        first = self.commit("SYNTHETIC_PRIVATE_MARKER")
+        self.commit("功能：中间主线提交")
+        head = self.commit("修复：最新主线提交")
+        event = {"before": "f" * 40, "after": head,
+                 "commits": [{"id": first}, {"id": head}]}
+        with self.assertRaisesRegex(policy.PolicyError, "^event_commit_scope_invalid$"):
+            policy.event_checks(self.target, event)
+
+    def test_missing_before_push_accepts_complete_scope_in_any_list_order(self):
+        self.commit("historical upstream baseline")
+        first = self.commit("功能：首个主线提交")
+        middle = self.commit("功能：中间主线提交")
+        head = self.commit("修复：最新主线提交")
+        event = {"before": "f" * 40, "after": head,
+                 "commits": [{"id": head}, {"id": first}, {"id": middle}]}
+        self.assertEqual(policy.event_checks(self.target, event),
+                         {"checked_commits": 3, "exempt_commits": 0, "errors": []})
+
+    def test_missing_before_push_rejects_invalid_or_unreachable_commit_ids(self):
+        baseline = self.commit("historical upstream baseline")
+        head = self.commit("功能：校验事件提交来源")
+        self.command(self.target, "checkout", "-b", "unmerged", baseline)
+        unmerged = self.commit("unmerged upstream commit")
+        self.command(self.target, "checkout", "main")
+        blob = self.command(self.target, "hash-object", "-w", "AGENTS.md")
+        tree = self.command(self.target, "rev-parse", head + "^{tree}")
+        self.command(self.target, "tag", "-a", "review-tag", head, "-m", "测试标签")
+        tag = self.command(self.target, "rev-parse", "refs/tags/review-tag")
+        missing = "e" * 40
+        cases = [
+            ("missing_commit", head, [missing, head]),
+            ("unreachable_commit", head, [unmerged, head]),
+            ("blob", head, [blob, head]),
+            ("tree", head, [tree, head]),
+            ("tag", head, [tag, head]),
+            ("missing_after", missing, [missing]),
+            ("non_commit_after", blob, [blob]),
+        ]
+        for label, after, listed in cases:
+            with self.subTest(label=label):
+                event = {"before": "f" * 40, "after": after,
+                         "commits": [{"id": sha} for sha in listed]}
+                with self.assertRaisesRegex(policy.PolicyError, "^event_commit_scope_invalid$"):
+                    policy.event_checks(self.target, event)
+
+    def test_missing_before_push_skips_merged_upstream_commits(self):
+        baseline = self.commit("historical upstream baseline")
+        local = self.commit("功能：新增检查入口")
+        self.command(self.target, "checkout", "-b", "upstream", baseline)
+        upstream = self.commit("upstream implementation")
+        self.command(self.target, "checkout", "main")
+        self.command(self.target, "merge", "--no-ff", "upstream", "-m", "Merge upstream")
+        head = self.command(self.target, "rev-parse", "HEAD")
+        event = {"before": "f" * 40, "after": head,
+                 "commits": [{"id": local}, {"id": upstream}, {"id": head}]}
+        self.assertEqual(policy.event_checks(self.target, event),
+                         {"checked_commits": 1, "exempt_commits": 1, "errors": []})
+
+    def test_missing_before_push_rejects_invalid_commit_lists(self):
+        baseline = self.commit("历史基线")
+        self.command(self.target, "update-ref", "refs/remotes/origin/main", baseline)
+        head = self.commit("测试：校验推送提交清单")
+        cases = [
+            ("null", {"commits": None}),
+            ("not_list", {"commits": {"id": head}}),
+            ("empty", {"commits": []}),
+            ("not_object", {"commits": [head]}),
+            ("missing_id", {"commits": [{}]}),
+            ("invalid_id", {"commits": [{"id": "not-a-commit"}]}),
+            ("duplicate", {"commits": [{"id": head}, {"id": head}]}),
+            ("missing_head", {"commits": [{"id": baseline}]}),
+        ]
+        for label, payload in cases:
+            with self.subTest(label=label):
+                event = {"before": "f" * 40, "after": head, "ref": "refs/heads/feature",
+                         "repository": {"default_branch": "main"}, **payload}
+                with self.assertRaisesRegex(policy.PolicyError, "^event_commit_scope_invalid$"):
+                    policy.event_checks(self.target, event)
+
+    def test_missing_before_push_rejects_truncated_commit_lists(self):
+        head = self.commit("测试：校验推送事件大小")
+        for size in (2048, 2049):
+            with self.subTest(size=size):
+                # 标识格式合法且互不重复，单独验证截断上限检查。
+                commits = [{"id": head}, *({"id": f"{number:040x}"} for number in range(size - 1))]
+                event = {"before": "f" * 40, "after": head, "commits": commits}
+                with self.assertRaisesRegex(policy.PolicyError, "^event_commit_scope_invalid$"):
+                    policy.event_checks(self.target, event)
+
     def test_new_branch_uses_default_branch_baseline(self):
         baseline = self.commit("existing upstream history")
         self.command(self.target, "update-ref", "refs/remotes/origin/main", baseline)

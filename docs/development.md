@@ -5,8 +5,9 @@
 <!-- friday-policy-core:start -->
 ## Friday 公共开发约定
 
-规范版本：2026-11-02.3
+规范版本：2026-11-09.1
 
+- 所有变更开始前，先获取目标仓库远端主干的最新代码，并从该最新提交新建本次任务分支；代码、文档、配置、脚本、Skill、AGENTS.md 与生成副本同步均适用。禁止直接在 `main`、`master` 或其他主干上开发，不得从未更新的本地主干或旧任务分支开始新任务；跨仓库变更时各仓库分别执行。
 - 新增人工提交使用中文说明目的，推荐“功能：……”“修复：……”“文档：……”。保留英文技术名称；不为格式要求重写上游或已有历史。
 - 新增、修改的解释性注释和文档字符串使用中文。保留工具指令、协议字段、标准术语、第三方原文及用于反例的测试数据；不要求批量翻译旧注释。
 - 协作规范正文统一使用中文；合并历史规则时整合同义要求，保留原有约束及必要的命令、文件名和技术术语。
@@ -15,8 +16,27 @@
 - 按变更选择相关验证，记录实际结果与未验证范围。代码提交、服务就绪、设备回报与使用者实物确认分别报告；普通测试使用隔离、合成输入。
 - 保留原仓库的隐私与权限约束。凭据、真实家庭画面、私有配置、备份和未审阅的私有历史不进入公共仓库；只提交当前任务的文件。
 - 提交、推送、发布、部署和真实设备动作按本次任务已有授权执行。只分析、只给方案、只读审查时遵守该边界；本规范和 Skill 不额外授予操作权限。
-- 完整规则和跨仓库同步方式见 [Friday 开发规范](https://github.com/lijunfeng722/project-index/blob/main/docs/development.md)。
+- 完整规则和跨仓库同步方式见 [Friday 开发规范](https://github.com/lijunfeng722/friday-project-index/blob/main/docs/development.md)。
 <!-- friday-policy-core:end -->
+
+## 所有变更先从最新主干建分支
+
+每个新变更任务写入仓库前，先检查当前分支、工作区已有改动与 Git 远端，按远端默认分支或仓库约定确认主干。获取远端最新代码后，直接从远端主干最新提交创建本次任务分支，不依赖本地主干是否更新，也不沿用旧任务分支。只读方案与审查无需建分支。
+
+以下以 `origin/main` 为例；执行时将远端、主干与任务分支名替换为目标仓库的实际值：
+
+```sh
+git status --short --branch
+git remote -v
+git ls-remote --symref origin HEAD
+git fetch --prune origin
+git switch --no-track -c codex/TASK origin/main
+git rev-parse HEAD
+```
+
+确认当前位于本次任务分支后才开始编辑、生成或同步文件，并记录最后一条命令输出的提交标识，作为本次任务的验证基线。无法获取最新主干时，先解决同步问题，不把缓存的远端引用当作已确认的最新代码。同一任务后续继续使用已创建的任务分支。
+
+原工作区有未提交改动或本机专用提交时，保留现场，使用 `git worktree add --no-track -b codex/TASK NEW_WORKTREE origin/main` 创建独立工作树；不要覆盖或重置已有改动，也不要把本机专用历史混入新分支。跨仓库任务必须为每个待修改仓库分别获取最新主干并创建任务分支，包括公共规则与下载副本的接收仓库。主干只用于同步或按授权合入已完成的变更，不直接承载开发编辑与提交。
 
 ## 仓库分工与文档影响
 
@@ -26,18 +46,18 @@
 | 依赖安装器及其测试 | Friday 的安装器源码；同步用户手册的下载副本、对应 SHA256 清单和安装说明 |
 | 日常启动、停止和重启脚本 | 元仓库根目录的程序与校验清单、`scripts/` 中的测试和同步工具；同步用户手册的下载副本与说明 |
 | 架构、授权边界、协议或数据流 | Friday 对应技术文档；需要时更新 Mermaid 流程图、时序图或架构图 |
-| 跨仓库关系、依赖或维护入口 | [项目索引](https://github.com/lijunfeng722/project-index)的 README、仓库简介与架构、维护说明 |
+| 跨仓库关系、依赖或维护入口 | [项目索引](https://github.com/lijunfeng722/friday-project-index)的 README、仓库简介与架构、维护说明 |
 | 纯内部重构、测试整理或开发规范 | 在 PR 说明无用户文档影响及理由；更新受影响的开发文档即可 |
 
 更新用户文档时说明使用者怎样操作、看到什么、需要什么准备。公开截图使用可重复的示例环境，标明模拟、未配置和实测范围。开发规范不混入面向家庭使用者的产品操作页面。
 
-第一版覆盖 Friday、friday-user-guide、project-index。ARL 是否接入另按维护范围决定；不向 HA、Xiaomi Home、Miloco、OpenClaw 等第三方源码自动写入本规范。
+第一版覆盖 Friday、friday-user-guide、friday-project-index。ARL 是否接入另按维护范围决定；不向 HA、Xiaomi Home、Miloco、OpenClaw 等第三方源码自动写入本规范。
 
 ## AGENTS.md 与 Skill 怎样配合
 
 各仓库的 `AGENTS.md` 用中文整合本仓库专用要求，并包含上方公共约定的生成副本。专用部分说明部署、隐私和验证的具体要求，公共部分统一维护提交与文档协作规则。三个仓库是独立仓库，元仓库的规则不会自动覆盖并列目录；公共部分通过显式同步更新，工作时无需联网读取规则。
 
-`friday-development` Skill 串联仓库定位、代码验证、文档影响和已授权交付。技能源码与界面元数据集中存放在元仓库的 [skills/friday-development/](https://github.com/lijunfeng722/project-index/tree/main/skills/friday-development)，完整规范的便携副本由工具生成到技能的 `references/development.md`。公共规范仍只在本页维护。
+`friday-development` Skill 串联仓库定位、代码验证、文档影响和已授权交付。技能源码与界面元数据集中存放在元仓库的 [skills/friday-development/](https://github.com/lijunfeng722/friday-project-index/tree/main/skills/friday-development)，完整规范的便携副本由工具生成到技能的 `references/development.md`。公共规范仍只在本页维护。
 
 `skills/` 用于集中维护技能源码。将其中的整个技能目录安装或链接到当前客户端实际发现的个人技能目录，再核对技能列表；不能仅凭克隆了元仓库就认定技能已经加载。已有同名技能先核对来源，不能直接覆盖。迁移源码目录时同步更新本机安装链接，必要时开启新会话。使用示例：
 
@@ -49,7 +69,7 @@ Skill 也适用于计划与审查请求，但这类请求只产出相应方案�
 
 ## 公共规则怎样同步
 
-修改本页公共约定时更新规范版本，然后在元仓库执行。将示例中的目录替换为实际克隆位置：
+修改本页公共约定时更新规范版本。执行写入同步前，元仓库和所有接收仓库都必须已按上方流程从各自最新主干创建本次任务分支；`sync --check` 为只读检查，无需建分支。然后在元仓库执行，将示例中的目录替换为实际克隆位置：
 
 ```sh
 python3 scripts/check_dev_policy.py sync --repo ../Friday --repo ../friday-user-guide
@@ -75,11 +95,10 @@ python3 scripts/check_dev_policy.py check
 
 应看到 `ok: true`。检查器核对公共规则、脚本、PR 模板和工作流的完整性；元仓库还核对规范源与技能副本。
 
-要检查本次新提交，先取得本次任务开始前的明确提交标识，再传入 `--base`，不扫描整个旧历史：
+要检查本次新提交，将创建任务分支时记录的主干提交标识传入 `--base`，不扫描整个旧历史：
 
 ```sh
-git rev-parse HEAD~1
-# 将上一条输出的基线提交标识填入下一条命令。
+# 将建分支时记录的基线提交标识填入下一条命令。
 python3 scripts/check_dev_policy.py check --base BASE_COMMIT
 ```
 
@@ -95,6 +114,6 @@ PR 模板要求分别填写用户文档、技术文档、顶级索引的影响�
 
 说明改动的仓库与用户行为、对应文档、实际验证、提交与推送状态。只有本次包含发布或部署时，才报告相应线上结果。设备控制效果单独记录使用者确认，保留未验证范围。
 
-维护和验收的现有入口见 [索引维护](https://github.com/lijunfeng722/project-index/blob/main/docs/maintenance.md)与[部署维护总览](https://github.com/lijunfeng722/project-index/blob/main/docs/operations.md)。
+维护和验收的现有入口见 [索引维护](https://github.com/lijunfeng722/friday-project-index/blob/main/docs/maintenance.md)与[部署维护总览](https://github.com/lijunfeng722/friday-project-index/blob/main/docs/operations.md)。
 
 日常启停工具在元仓库根目录维护，使用 `python3 scripts/sync_service_tools.py --guide ../friday-user-guide` 更新下载和测试副本，再运行同一命令加 `--check` 核对。源仓库运行 `python3 scripts/test_services.py` 与 `python3 scripts/test_service_distribution.py`；这些测试只使用临时进程和合成配置。服务清单继续保存在本机私有目录。

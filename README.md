@@ -71,7 +71,7 @@ flowchart LR
 ## 目录
 
 ```text
-project-index/
+friday-project-index/
 ├── README.md
 ├── AGENTS.md              # 本仓库入口与公共开发约定
 ├── CONTRIBUTING.md        # 开发协作入口

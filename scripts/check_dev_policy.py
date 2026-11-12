@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Friday 开发约定检查；源文件由 project-index 维护。
+# Friday 开发约定检查；源文件由 friday-project-index 维护。
 """离线检查开发约定，显式同步受维护仓库，不操作服务或设备。"""
 
 import argparse
@@ -11,7 +11,7 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = "https://github.com/lijunfeng722/project-index"
+SOURCE = "https://github.com/lijunfeng722/friday-project-index"
 CORE_START = "<!-- friday-policy-core:start -->"
 CORE_END = "<!-- friday-policy-core:end -->"
 START = "<!-- friday-dev-policy:start -->"
@@ -22,14 +22,14 @@ TEMPLATE = ".github/pull_request_template.md"
 WORKFLOW = ".github/workflows/development-policy.yml"
 SKILL_REFERENCE = "skills/friday-development/references/development.md"
 SIGNATURES = {
-    CHECKER: "# Friday 开发约定检查；源文件由 project-index 维护。",
-    TEMPLATE: "<!-- Friday 开发约定模板；源文件由 project-index 维护。 -->",
-    WORKFLOW: "# Friday 开发约定工作流；源文件由 project-index 维护。",
+    CHECKER: "# Friday 开发约定检查；源文件由 friday-project-index 维护。",
+    TEMPLATE: "<!-- Friday 开发约定模板；源文件由 friday-project-index 维护。 -->",
+    WORKFLOW: "# Friday 开发约定工作流；源文件由 friday-project-index 维护。",
 }
-REFERENCE_HEADER = "<!-- 生成副本：在 project-index/docs/development.md 修改，再运行规则同步。 -->\n\n"
+REFERENCE_HEADER = "<!-- 生成副本：在 friday-project-index/docs/development.md 修改，再运行规则同步。 -->\n\n"
 SHA = re.compile(r"(?:[0-9a-f]{40}|[0-9a-f]{64})\Z")
 PUBLIC_ERRORS = frozenset("""invalid_policy_or_event_json git_query_unavailable
-git_reference_or_query_unavailable shared_rules_markers_invalid run_sync_from_project_index
+git_reference_or_query_unavailable shared_rules_markers_invalid run_sync_from_friday_project_index
 target_must_be_repository_root target_repository_not_managed generated_path_is_symlink
 existing_file_is_not_managed existing_snapshot_is_not_managed policy_schema_invalid
 shared_rules_digest_invalid commit_head_invalid commit_base_invalid event_commit_scope_invalid
@@ -76,17 +76,17 @@ def section(text, start, end):
 
 def canonical(root):
     if not (root / "repos.json").is_file():
-        raise PolicyError("run_sync_from_project_index")
+        raise PolicyError("run_sync_from_friday_project_index")
     try:
         text = (root / "docs/development.md").read_text(encoding="utf-8")
         _, rules, _ = section(text, CORE_START, CORE_END)
         version = re.search(r"^规范版本：([0-9.\-]+)$", rules, re.M).group(1)
         rows = read_json(root / "repos.json")["repositories"]
         urls = {r["id"]: r["url"].rstrip("/") for r in rows}
-        managed = {"project-index": SOURCE, "friday": urls["friday"], "user-guide": urls["user-guide"]}
+        managed = {"friday-project-index": SOURCE, "friday": urls["friday"], "user-guide": urls["user-guide"]}
         assets = {p: (root / p).read_bytes() for p in SIGNATURES}
     except (OSError, KeyError, TypeError, AttributeError):
-        raise PolicyError("run_sync_from_project_index") from None
+        raise PolicyError("run_sync_from_friday_project_index") from None
     return text, rules, version, managed, assets
 
 
@@ -134,7 +134,7 @@ def expected_files(source, target):
               "assets_sha256": {p: digest(value) for p, value in assets.items()}}
     files = {**assets, "AGENTS.md": agents.encode(),
              SNAPSHOT: (json.dumps(policy, ensure_ascii=False, indent=2) + "\n").encode()}
-    if role == "project-index":
+    if role == "friday-project-index":
         files[SKILL_REFERENCE] = (REFERENCE_HEADER + text).encode()
     # 覆盖前先检查所有目的文件，避免发现同名用户文件时已经写入一半。
     for name in files:
@@ -178,7 +178,7 @@ def check_repo(root):
     policy = read_json(root / SNAPSHOT)
     errors = []
     if (policy.get("schema_version") != 1 or policy.get("source_repository") != SOURCE
-            or policy.get("repository") not in {"project-index", "friday", "user-guide"}):
+            or policy.get("repository") not in {"friday-project-index", "friday", "user-guide"}):
         raise PolicyError("policy_schema_invalid")
     rules = policy.get("shared_rules")
     if not isinstance(rules, str) or digest(rules.encode()) != policy.get("shared_rules_sha256"):
@@ -193,7 +193,7 @@ def check_repo(root):
         path = root / name
         if not path.is_file() or digest(path.read_bytes()) != hashes.get(name):
             errors.append("managed_asset_drift:" + name)
-    if policy["repository"] == "project-index":
+    if policy["repository"] == "friday-project-index":
         text, source_rules, version, _, _ = canonical(root)
         if version != policy.get("version") or source_rules != rules:
             errors.append("canonical_rules_not_synced")
@@ -218,6 +218,10 @@ def commit_language_errors(root, base, head="HEAD"):
         shas = git(root, "rev-list", "--first-parent", revision).splitlines()
     else:
         shas = [tip]
+    return commit_language_errors_for_shas(root, shas)
+
+
+def commit_language_errors_for_shas(root, shas):
     errors = []
     checked = exempt = 0
     for sha in shas:
@@ -242,9 +246,9 @@ def documentation_errors(body, bot=False):
         return ["pr_documentation_impact_missing"]
     errors = []
     for label, code in [("用户文档", "user"), ("技术文档", "technical"), ("顶级索引", "index")]:
-        # 只允许横向空白，避免空依据跨行吞入下一项内容后被误判为已填写。
-        values = re.findall(r"^[ \t]*[-*]?[ \t]*" + label + r"[：:][ \t]*(.*?)[ \t]*$", body, re.M)
-        reasons = re.findall(r"^[ \t]*[-*]?[ \t]*" + label + r"依据[：:][ \t]*(.*?)[ \t]*$", body, re.M)
+        # 只允许横向空白和 CRLF 行尾，避免空依据跨行吞入下一项内容后被误判为已填写。
+        values = re.findall(r"^[ \t]*[-*]?[ \t]*" + label + r"[：:][ \t]*(.*?)[ \t]*\r?$", body, re.M)
+        reasons = re.findall(r"^[ \t]*[-*]?[ \t]*" + label + r"依据[：:][ \t]*(.*?)[ \t]*\r?$", body, re.M)
         if len(values) != 1 or values[0] not in {"已更新", "无影响", "不适用"}:
             errors.append("pr_docs_impact_required:" + code)
             continue
@@ -254,6 +258,41 @@ def documentation_errors(body, bot=False):
         elif values[0] == "已更新" and not re.search(r"https?://\S+|[^\s`]+\.(?:md|rst|png|jpg|jpeg|svg)|#[0-9]+", reason):
             errors.append("pr_docs_reference_required:" + code)
     return errors
+
+
+def push_event_commit_language_errors(root, event, after):
+    commits = event.get("commits")
+    if not isinstance(commits, list) or not commits or len(commits) >= 2048:
+        raise PolicyError("event_commit_scope_invalid")
+    commit_shas = [commit.get("id") for commit in commits if isinstance(commit, dict)]
+    if (len(commit_shas) != len(commits)
+            or any(not isinstance(sha, str) or not SHA.fullmatch(sha) for sha in commit_shas)
+            or len(set(commit_shas)) != len(commit_shas)):
+        raise PolicyError("event_commit_scope_invalid")
+    shas = set(commit_shas)
+    if after not in shas:
+        raise PolicyError("event_commit_scope_invalid")
+    try:
+        history = git(root, "rev-list", "--parents", after).splitlines()
+    except PolicyError as error:
+        if error.args == ("git_reference_or_query_unavailable",):
+            raise PolicyError("event_commit_scope_invalid") from None
+        raise
+    # 祖先图只校验提交类型与可达性；语言检查仍限于事件内的第一父链。
+    parents = {row[0]: row[1:] for row in (line.split() for line in history)}
+    if not shas.issubset(parents):
+        raise PolicyError("event_commit_scope_invalid")
+    pushed = []
+    sha, gap = after, False
+    while sha in parents:
+        if sha in shas:
+            if gap:
+                raise PolicyError("event_commit_scope_invalid")
+            pushed.append(sha)
+        else:
+            gap = True
+        sha = parents[sha][0] if parents[sha] else None
+    return commit_language_errors_for_shas(root, pushed)
 
 
 def event_checks(root, event):
@@ -271,12 +310,11 @@ def event_checks(root, event):
     before, after = event.get("before"), event["after"]
     if not isinstance(before, str) or not SHA.fullmatch(before) or not isinstance(after, str) or not SHA.fullmatch(after):
         raise PolicyError("event_commit_scope_invalid")
-    branch = event.get("repository", {}).get("default_branch", "")
-    if not isinstance(branch, str) or not re.fullmatch(r"[A-Za-z0-9_./-]+", branch) or branch.startswith("-"):
-        raise PolicyError("event_default_branch_invalid")
-    ref = "refs/remotes/origin/" + branch
-
     def default_branch_baseline():
+        branch = event.get("repository", {}).get("default_branch", "")
+        if not isinstance(branch, str) or not re.fullmatch(r"[A-Za-z0-9_./-]+", branch) or branch.startswith("-"):
+            raise PolicyError("event_default_branch_invalid")
+        ref = "refs/remotes/origin/" + branch
         try:
             baseline = git(root, "merge-base", after, ref)
         except PolicyError:
@@ -289,10 +327,12 @@ def event_checks(root, event):
         # 新分支不回扫已有历史；优先取默认分支的共同祖先，首次导入只检查当前提交。
         before = default_branch_baseline()
     else:
-        # 强推可能使旧 tip 不再可用，或新 tip 不再以旧 tip 为祖先。
         try:
             git(root, "rev-parse", "--verify", "--end-of-options", before + "^{commit}")
         except PolicyError:
+            # 已提供的事件清单必须完整校验，不能用基线回退绕过无效清单。
+            if "commits" in event:
+                return push_event_commit_language_errors(root, event, after)
             before = default_branch_baseline()
             if before is None:
                 raise PolicyError("event_commit_scope_unavailable") from None

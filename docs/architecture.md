@@ -22,6 +22,7 @@ flowchart TB
   Playback --> NAS[已配置的 NAS 或录像来源]
   API -. 可选智能任务 .-> ARL[ARL 共享运行服务]
   ARL -. 单独配置 .-> Models[模型 Provider 与外部工具]
+  API -. 可选增强与本机预算 .-> OpenAI[OpenAI API]
 ```
 
 ## 哪些是独立服务
@@ -34,9 +35,28 @@ flowchart TB
 | Miloco | 按官方插件平台部署 | 小米账号与摄像头服务就绪，不自动替 Friday 安装识别环境 |
 | OpenClaw | 可选的插件宿主 | 本次使用，不代表所有 Miloco 方案都强制使用它 |
 | ARL | 可选智能运行服务 | 普通本地手势不依赖其云端模型任务 |
+| OpenAI API | 可选云端服务，Friday 服务端保管已有 Key | 各能力单独开启；本机用量上限不等于整个账户账单余额 |
 | 用户手册 | GitHub Pages 静态站点 | 阅读文档不会连接任何家庭账号或控制设备 |
 
 ## 部署维护代码的归属
+
+智能通道、用量账本和降级由 Friday 主仓维护。ARL 的 SDK 与原生回执保留原协议，API 结果不能冒充 ARL 原生确认。用户手册负责设置步骤、FAQ 与示例截图；本索引只记录组件关系。
+
+```mermaid
+flowchart LR
+  Input[家庭文字或主动语音] --> Choice[Friday 通道与每日预算]
+  Choice --> Cloud[可选 OpenAI API]
+  Choice --> ARL[可选 ARL · Codex]
+  Cloud --> Draft[本地只读查询或待确认草稿]
+  ARL --> Draft
+  Choice --> Local[额度或服务不可用时保留本地功能]
+  Song[歌名与演唱者] --> Image[单独开启的背景预取]
+  Image --> Cache[校验与缓存]
+  Cache --> Ticket[原歌曲媒体票据与电视当前歌曲检查]
+  Image -. 失败或达上限 .-> Theme[本地主题继续播放]
+```
+
+Responses 负责受约束解释，Decisions 仍是影子建议，Realtime 转写经用户核对后才发送，Image API 只接收歌名和演唱者。各层不新增设备权限。详细设置见[用户手册](https://lijunfeng722.github.io/friday-user-guide/guides/intelligence/)，技术范围见[Friday 智能通道](https://github.com/Geeprox/Friday/blob/main/docs/intelligence.md)。
 
 Friday 主仓维护依赖安装器和对应回归测试。元仓库根目录维护日常启动、停止、重启入口及服务管理程序，scripts/ 维护隔离测试和下载同步工具。用户手册提供同内容下载副本及操作说明；程序在部署电脑执行，服务清单与账号保存在本机私有目录。具体文件、顺序、升级原因和验收记录见[部署维护总览](operations.md)。
 

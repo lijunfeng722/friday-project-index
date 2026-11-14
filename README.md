@@ -28,12 +28,14 @@
 | [Friday](https://github.com/Geeprox/Friday) | 家庭产品主仓：Web 界面、设备操作、手势、回看与原生组件 | 主项目 | 核心 | [简介](repos/friday.md) |
 | [ARL](https://github.com/Geeprox/ARL) | 共享智能运行服务与原生管理界面 | 相关项目 | 智能能力按需 | [简介](repos/arl.md) |
 | [Friday 用户手册](https://github.com/lijunfeng722/friday-user-guide) | 图文手册、GitHub Pages 与部署维护脚本下载副本 | 独立文档 | 使用与部署维护 | [简介](repos/user-guide.md) |
-| [Home Assistant Core](https://github.com/home-assistant/core) | 家庭房间、设备、状态和服务的统一接入 | 外部依赖 | 真实家庭接入 | [简介](repos/home-assistant.md) |
+| [Home Assistant Core](https://github.com/home-assistant/core) | 房间、设备、状态和规则事件 | 可选集成 | 保留 HA 设备或既有自动化时 | [简介](repos/home-assistant.md) |
 | [Xiaomi Home 集成](https://github.com/XiaoMi/ha_xiaomi_home) | 让 HA 接入小米家庭账号与受支持设备 | HA 集成 | HA 接入小米设备时 | [简介](repos/xiaomi-home.md) |
-| [Xiaomi Miloco](https://github.com/XiaoMi/xiaomi-miloco) | 小米授权、摄像头与智能服务相关能力 | 外部可选服务 | 按摄像头方案选用 | [简介](repos/miloco.md) |
+| [Xiaomi Miloco](https://github.com/XiaoMi/xiaomi-miloco) | 提供官方 MIoT SDK、摄像头与智能服务 | 外部依赖 | 按米家接入或摄像头方案选用 | [简介](repos/miloco.md) |
 | [OpenClaw](https://github.com/openclaw/openclaw) | 本次选用的 Miloco 插件宿主平台 | 可选宿主 | 选择该 Miloco 部署方案时 | [简介](repos/openclaw.md) |
 
 ## 先记住的关系
+
+macOS 的米家直连可通过已授权家庭和本地中枢为已登记设备读取状态和发出指令。保留 HA 作为家庭来源时，可继续使用对应设备和已有规则。参见[家庭连接](https://lijunfeng722.github.io/friday-user-guide/getting-started/connect-home/)。
 
 **Xiaomi Home 集成装在 Home Assistant 内部。** Miloco、ARL 与 OpenClaw 有各自的服务职责；并不是为了打开 Friday 就必须启动所有可选功能。
 

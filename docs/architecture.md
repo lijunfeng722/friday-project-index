@@ -13,7 +13,9 @@ flowchart TB
     API --> Vision[独立本地视觉运行环境]
     API --> Playback[录像保护预览]
   end
-  Query --> HA[Home Assistant Core]
+  Query --> HA[可选 Home Assistant Core]
+  Query --> MIoT[米家中枢的已核对设备属性]
+  MIoT --> Devices
   HA --> XH[HA 内的 Xiaomi Home 集成]
   XH --> Devices[家庭设备]
   Vision --> SDK[摄像头 SDK 与媒体连接]
@@ -67,6 +69,8 @@ flowchart LR
 ## 设备动作的两种来源
 
 设备页与手势规则使用 Friday 配置的目标和控制范围。米家一键场景按照上游场景的整组内容执行，是独立的手动入口，涉及设备可能更多；不要把逐台 HA 控制授权说明套用到场景范围。使用前应在确认界面核对名称与设备数量。
+
+Friday 自己保存定时任务和执行回执。米家直连使用本机时钟和米家中枢验证属性及写后状态。HA 继续提供依赖其事件订阅与测量质量的规则入口。
 
 ## 如何随项目变化更新
 

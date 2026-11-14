@@ -35,7 +35,7 @@
 
 ## 先记住的关系
 
-macOS 的米家直连可通过已授权家庭和本地中枢为已登记设备读取状态和发出指令。保留 HA 作为家庭来源时，可继续使用对应设备和已有规则。参见[家庭连接](https://lijunfeng722.github.io/friday-user-guide/getting-started/connect-home/)。
+macOS 的米家直连通过已授权家庭和本地中枢读取已登记设备的状态，也可执行已核对的开关和空调设温定时任务。依赖 HA 事件或传感器采样质量的规则继续使用原连接。参见[家庭连接](https://lijunfeng722.github.io/friday-user-guide/getting-started/connect-home/)。
 
 **Xiaomi Home 集成装在 Home Assistant 内部。** Miloco、ARL 与 OpenClaw 有各自的服务职责；并不是为了打开 Friday 就必须启动所有可选功能。
 

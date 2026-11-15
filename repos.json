@@ -6,7 +6,7 @@
       "id": "friday",
       "name": "Friday",
       "url": "https://github.com/Geeprox/Friday",
-      "role": "家庭产品主仓：Web 界面、设备操作、手势、回看与原生组件",
+      "role": "家庭产品主仓：Web 界面、设备操作、手势、回看、原生组件与 CPU 镜像构建",
       "kind": "主项目",
       "deployment": "独立运行；本地视觉属于本仓库，不是 Miloco 内置手势",
       "required": "核心"
@@ -17,7 +17,7 @@
       "url": "https://github.com/Geeprox/ARL",
       "role": "共享智能运行服务与原生管理界面",
       "kind": "相关项目",
-      "deployment": "独立服务；本地确定性手势不要求先接通模型任务",
+      "deployment": "原生部署为独立服务；Linux CPU 候选与 Friday 同容器，确定性手势不要求模型任务",
       "required": "智能能力按需"
     },
     {

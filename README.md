@@ -8,6 +8,8 @@
 - **准备开发、修复或维护文档**：阅读[开发规范](docs/development.md)与 [CONTRIBUTING.md](CONTRIBUTING.md)，使用各仓库的 `AGENTS.md` 或 [Friday 开发 Skill](skills/friday-development/SKILL.md)。
 - **想更新索引**：按[维护方式](docs/maintenance.md)核对来源、关系与链接。
 
+Linux x86_64 CPU 迁移的候选范围与验证边界见[Linux CPU 适配记录](docs/operations.md#linux-cpu-适配候选2026-11-12)。
+
 ## 根目录启停入口
 
 | 操作 | 文件 | 行为 |
@@ -95,3 +97,5 @@ friday-project-index/
 ```
 
 索引核对日期：**2026-11-01**。上游版本和支持范围以各原仓库及其官方说明为准；本索引不代表每一项能力均已完成现场验收。
+
+Linux CPU 镜像的构建、本机页面、独立数据卷与正常停止入口见[容器启动验证](docs/linux-container.md)。

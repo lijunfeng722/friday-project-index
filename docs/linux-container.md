@@ -8,14 +8,14 @@
 
 ```sh
 python3 scripts/build_linux_container.py
-docker compose -f docker/compose.yaml up -d --wait --wait-timeout 180
+docker compose -f docker/compose.yaml up -d --wait --wait-timeout 660
 docker compose -f docker/compose.yaml ps
 python3 scripts/verify_linux_container.py --image friday-linux-cpu:local --output .artifacts/linux-container/verification.json
 ```
 
 构建脚本从通过公开输入扫描的 Friday 快照和 ARL 运行文件创建临时上下文，不发送 Git 历史、忽略的数据目录、环境文件或本机凭据。仓库不并列时，用 `--friday`、`--arl` 指定目录。镜像实现统一位于 Friday 的 `docker/` 和 `scripts/build_linux_container.py`；本仓库脚本是兼容入口，只维护 Compose 和家庭部署说明。基础系统摘要和 Python 组件版本固定在 Friday 的 Dockerfile 与各组件锁文件中。需要 Docker BuildKit；不会切换当前 Docker context，也不会启动或停止其他项目的容器。
 
-镜像包括 Web、ARL、CPU 视觉/语音依赖及独立的 ONNX 视觉、ONNX 分离环境。大型模型、摄像头 SDK、账号、NAS 挂载和 Codex CLI 授权需要按配套技术文档另外准备；默认不下载或加载模型。本机 Docker 内存为 8 GiB 的环境不满足可选重型 CPU 画面复核的 24 GiB 主机准入，本镜像不安装该额外环境。
+镜像包括 Web、ARL、CPU 视觉/语音依赖及独立的 ONNX 视觉、ONNX 分离环境。摄像头 SDK 在首次启动时从固定官方来源自动下载并校验，用户不需要手动取得 wheel 或重新构建；大型模型、账号、NAS 挂载和 Codex CLI 授权仍按配套技术文档准备，默认不下载或加载模型。本机 Docker 内存为 8 GiB 的环境不满足可选重型 CPU 画面复核的 24 GiB 主机准入，本镜像不安装该额外环境。
 
 人体和手部已改用固定 OpenCV Zoo ONNX 模型，在当前无 AVX 的 amd64 模拟环境通过实际模型加载与推理。基础视觉不导入 MediaPipe 原生库；可选 YAMNet 环境声音分类仍受其 AVX 条件限制，实验性虹膜注视暂标为不支持。SenseVoice 和 KTV MDX 的 CPU 推理已分别实测。
 
@@ -34,7 +34,7 @@ Compose 只向宿主的 `127.0.0.1` 发布 8740、18745。容器内部的专用�
 
 健康检查分别访问 Friday 状态接口、带令牌的 ARL 设置 API 和 ARL Unix socket。`healthy` 证明这三条控制面链路可用；模拟数据、未配置模型、Apple 不支持仍明确保留。启动后可查看页面和配置，不会仅因容器启动就控制真实设备。
 
-验证脚本要求明确的 `--image` 与 `--output`。它为本轮新建随机名称、随机本机端口和匿名数据卷的模拟容器，检查 HTTP、授权、三个 CPU 环境、正常重启、设置持久化和令牌轮换，结束后回收本轮资源。不会复用或重启当前家庭容器；旧的 `--restart`、`--expect-mode` 参数已移除。此验收不连接供应商或执行模型推理。
+验证脚本要求明确的 `--image` 与 `--output`。它为本轮新建随机名称、随机本机端口和匿名数据卷的模拟容器，检查 HTTP、授权、三个 CPU 环境、正常重启、设置持久化和令牌轮换，结束后回收本轮资源。不会复用或重启当前家庭容器；旧的 `--restart`、`--expect-mode` 参数已移除。常规验收跳过 SDK 下载；追加 `--camera-sdk` 会实际访问官方发行地址并验证首次安装和重启复用，不登录供应商、不连接设备或执行模型推理。
 
 数据分别保存在 Compose 管理的 `friday-data`、`friday-cache` 卷中。访问令牌文件仅当前容器账号可读；不写入构建层或容器日志。模型和服务账号以后由操作者按原入口单独准备，不能直接复制 macOS 虚拟环境、动态库和钥匙串。
 
@@ -51,15 +51,15 @@ docker compose -f docker/compose.yaml start --wait
 
 ## 接入已有家庭
 
-需要包含摄像头 SDK 的镜像时，先取得技术文档指定的官方 Linux wheel，再构建独立标签：
+需要真实家庭模式时，使用同一自动安装镜像构建独立标签；首次启动会完成 SDK 下载与校验：
 
 ```sh
-python3 scripts/build_linux_container.py --camera-sdk /path/to/miloco_miot-2026.9.11-py3-none-manylinux_2_28_x86_64.whl --tag friday-linux-cpu:household
-docker compose -f docker/compose.yaml -f docker/compose.household.yaml up -d --wait --wait-timeout 180
+python3 scripts/build_linux_container.py --tag friday-linux-cpu:household
+docker compose -f docker/compose.yaml -f docker/compose.household.yaml up -d --wait --wait-timeout 660
 docker compose -f docker/compose.yaml -f docker/compose.household.yaml exec runtime python /opt/container/entrypoint.py health
 ```
 
-构建入口核验 SDK 整包摘要，并用 Friday 仓库的 `docker/camera-constraints.txt` 限定配套依赖；不会把账号、模型或家庭数据打包进镜像。实际切换前，需要先停止原 Friday，再把私有状态副本导入已有数据卷：家庭设置、人物库和规则库位于 `data/household/`，HA 授权位于 `data/credentials/`，摄像头配置、原暂停标记与模型位于 `data/embodied/`。数据库使用停止后的完整快照，不复制运行中的数据库单文件、macOS 虚拟环境、旧进程号或锁。
+SDK 版本和两层摘要固定在 Friday 的 `docker/camera-sdk-lock.json`；配套依赖在构建时按 `docker/camera-constraints.txt` 固定，SDK 本体只在用户容器启动后安装到私有卷。不会把账号、模型或家庭数据打包进镜像。实际切换前，需要先停止原 Friday，再把私有状态副本导入已有数据卷：家庭设置、人物库和规则库位于 `data/household/`，HA 授权位于 `data/credentials/`，摄像头配置、原暂停标记与模型位于 `data/embodied/`。数据库使用停止后的完整快照，不复制运行中的数据库单文件、macOS 虚拟环境、旧进程号或锁。
 
 迁移时核对容器能够访问同一个 HA 实例，保留实例标识，并将设置和授权文件中的 HA 地址一致地替换为其容器可达地址；不能把相同端口当成同一实例的证明。Docker Desktop 可访问宿主提供的入口，Linux Engine 应按实际网络配置地址。ARL 地址改为容器自己的状态目录。设置与凭据只在私有卷内调整，原配置保留用于回退。
 
@@ -114,4 +114,11 @@ python3 -m homeplane.embodied.camera_udp_relay --state .artifacts/camera-udp-rel
 
 Friday 的 GitHub Actions 先执行同一提交的源码、隐私和回归检查，再构建 amd64 镜像并做隔离验收。`docker/runtime-lock.json` 固定 ARL 提交及运行文件摘要；发布构建拒绝脏工作区和不匹配的来源。已验收镜像通过短期构建附件交给发布任务，发布任务不重新构建。每次成功主干运行使用包含完整 Git SHA、运行编号与尝试次数的标签，并记录镜像 digest；`main` 只是方便查看最新合格版本的可变别名。部署应固定 digest。
 
-流水线不连接家庭服务，不执行自动部署，也不包含账号、家庭数据、模型权重或条件性的 Miloco 摄像头 SDK。公开镜像发布范围仍待本轮确认；不要把完成本地构建写成已在 GHCR 发布。现有家庭 SDK 镜像保持本地，SDK 许可边界见 [官方版本许可证](https://github.com/XiaoMi/xiaomi-miloco/blob/v2026.9.11/LICENSE.md)。
+流水线不连接家庭服务，不执行自动部署，也不包含账号、家庭数据、模型权重或条件性的 Miloco 摄像头 SDK。公开镜像不含 SDK 本体，首次启动自动下载的范围已确定；不要把完成本地构建写成已在 GHCR 发布。现有家庭 SDK 镜像保持本地，SDK 许可边界见 [官方版本许可证](https://github.com/XiaoMi/xiaomi-miloco/blob/v2026.9.11/LICENSE.md)。
+
+
+## 首次 SDK 安装与故障恢复
+
+默认自动安装 v2026.9.11，日志显示 `downloading`、`installed_verified`；成功后的启动显示 `cached_verified`，无需再次下载。安装目录为数据卷中的 `camera-sdk/2026.9.11/`，保留 wheel、许可证、说明及校验清单。可用 `docker compose -f docker/compose.yaml exec runtime python /opt/container/entrypoint.py camera-sdk-status` 复核。下载中断时启动失败，恢复网络后重启会重试；校验不一致不会继续启动。缓存损坏需先停止对应容器，备份并移走该版本目录再重启，不能删除整个数据卷。
+
+项目仅用于非商业用途；保留的 Xiaomi Miloco 许可证还限制使用范围。自动下载和非商业说明不代表取得额外授权。许可证位于镜像 `/opt/container/licenses/Xiaomi-Miloco-LICENSE.md` 及安装目录 `LICENSE.md`，授权边界写入 `NOTICE.txt`。新流程只用于新建或明确升级的容器，不会修改现有家庭镜像、卷或暂停状态。

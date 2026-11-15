@@ -2,6 +2,19 @@
 
 此入口将本次 Friday 与 ARL 候选代码构建为 `linux/amd64` 镜像。默认启动 Friday 的明确模拟模式、ARL Linux 宿主和本机设置页，使用独立数据卷，不导入 Mac 家庭配置、账号或自动启动摄像头。它是部署基础与启动检查入口，不能把健康状态当成完整家庭功能或实物动作验收。
 
+## 使用已发布镜像
+
+发布流程成功后，镜像地址为 `ghcr.io/geeprox/friday-cpu`。`main` 指向最新通过验收的主干镜像，生产部署建议从 Actions 发布摘要复制 `@sha256:…` 固定版本；不要把本地构建或 PR 检查成功当成镜像已经发布。
+
+在新部署使用配套 Compose，无需在本机编译源码或准备 SDK 文件：
+
+```sh
+FRIDAY_RUNTIME_IMAGE=ghcr.io/geeprox/friday-cpu:main docker compose -f docker/compose.yaml pull
+FRIDAY_RUNTIME_IMAGE=ghcr.io/geeprox/friday-cpu:main docker compose -f docker/compose.yaml up -d --wait --wait-timeout 660
+```
+
+也可在本机私有 `.env` 中设置同一个 `FRIDAY_RUNTIME_IMAGE`，以后所有 Compose 命令复用该值。家庭覆盖文件使用同一变量，不会悄悄切回本地标签。已有部署先按备份和停止步骤规划升级；本页发布流程不会替换正在运行的容器。首次启动仅准备固定 SDK，模型、账号和家庭配置仍需单独完成。
+
 ## 构建和启动
 
 三个配套仓库应并列放置：`project-index/`、`Friday/`、`ARL/`，均使用包含本次 Linux 适配的代码。在本索引仓库执行：

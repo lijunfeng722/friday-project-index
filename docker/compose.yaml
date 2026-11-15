@@ -1,7 +1,7 @@
 name: friday-linux-cpu
 services:
   runtime:
-    image: friday-linux-cpu:local
+    image: ${FRIDAY_RUNTIME_IMAGE:-friday-linux-cpu:local}
     platform: linux/amd64
     init: true
     ports:

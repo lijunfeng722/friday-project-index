@@ -1,0 +1,22 @@
+name: friday-linux-cpu
+services:
+  runtime:
+    image: ${FRIDAY_RUNTIME_IMAGE:-friday-linux-cpu:local}
+    platform: linux/amd64
+    init: true
+    ports:
+      - "127.0.0.1:8740:8740"
+      - "127.0.0.1:18745:18745"
+    volumes:
+      - friday-data:/opt/friday/data
+      - friday-cache:/opt/friday/.artifacts
+    stop_grace_period: 60s
+    mem_limit: 6g
+    cpus: 4
+    pids_limit: 256
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: "no"
+volumes:
+  friday-data:
+  friday-cache:

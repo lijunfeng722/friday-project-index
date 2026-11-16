@@ -91,3 +91,22 @@ flowchart LR
 ## 如何随项目变化更新
 
 新增仓库先填写职责、必要关系和官方入口；业务能力改变时，先更新产品源码，再更新手册任务页，最后修订本索引的关系说明。详见[维护方式](maintenance.md)。
+
+## Linux CPU 镜像边界
+
+本轮先保持单一 amd64 镜像。ARL 的进程身份与 Unix socket 校验要求同一容器中的进程可见性，不把它当作已经支持跨容器拆分。HA 继续独立运行；模型缓存、家庭状态与账号在卷中。
+
+```mermaid
+flowchart LR
+  CI[Friday GitHub Actions] --> Image[同一份已验收的 CPU 镜像]
+  Lock[固定 ARL 提交与文件摘要] --> CI
+  subgraph Runtime[同一 Linux 容器]
+    Web[Friday Web 与家庭能力] --> ARL[ARL Linux 宿主与设置]
+    Web --> CPU[CPU 视觉、语音与 KTV 进程]
+  end
+  Image -. 操作者选择版本后部署 .-> Runtime
+  Web --> HA[已有 Home Assistant]
+  Runtime --> Volumes[独立状态与模型缓存卷]
+```
+
+Dockerfile、启动程序、构建和隔离验证归 Friday 仓库；项目索引维护 Compose 与兼容脚本。CI 不自动升级家庭服务。条件性摄像头 SDK 不在公开构建输入中，源码与镜像发布状态分别确认。

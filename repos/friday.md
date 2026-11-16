@@ -25,3 +25,7 @@ ARL · Codex 与 OpenAI API 是可选文字智能通道，使用不同凭据与�
 本机 API 配置与背景库属于私有运行数据，不进入仓库或可清理构建目录。用户手册维护开关、上限、隐私范围与示例截图；接口和数据流见[主仓智能通道说明](https://github.com/Geeprox/Friday/blob/main/docs/intelligence.md)。软件回归不替代真实 API 账户、麦克风和电视验收。
 
 参见[整体架构](../docs/architecture.md)，或[返回总索引](../README.md)。
+
+Linux x86_64 CPU 配套候选、依赖与验证边界见[维护记录](../docs/operations.md#linux-cpu-适配候选2026-11-12)，已经完成部分真实家庭验收，准确范围见维护记录；自动镜像发布另行验收。
+
+镜像源码、固定 ARL 输入和 GitHub Actions 由 Friday 仓库维护；本索引保留 Compose 与兼容维护入口。

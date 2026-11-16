@@ -1,0 +1,6 @@
+# 仅在私有家庭配置与授权已经导入同一数据卷后叠加使用。
+services:
+  runtime:
+    image: ${FRIDAY_RUNTIME_IMAGE:-friday-linux-cpu:household}
+    environment:
+      FRIDAY_CONTAINER_PROFILE: household

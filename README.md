@@ -8,7 +8,7 @@
 - **准备开发、修复或维护文档**：阅读[开发规范](docs/development.md)与 [CONTRIBUTING.md](CONTRIBUTING.md)，使用各仓库的 `AGENTS.md` 或 [Friday 开发 Skill](skills/friday-development/SKILL.md)。
 - **想更新索引**：按[维护方式](docs/maintenance.md)核对来源、关系与链接。
 
-Linux x86_64 CPU 迁移的候选范围与验证边界见[Linux CPU 适配记录](docs/operations.md#linux-cpu-适配候选2026-11-12)。
+Linux x86_64 部署可直接查看[惠普四项实机验收](docs/linux-container.md#惠普原生-linux-实机验收)或使用 [Friday Linux 部署 Skill](skills/friday-linux-deployment/SKILL.md)。早期候选范围见 [Linux CPU 适配记录](docs/operations.md#linux-cpu-适配候选2026-11-12)。
 
 ## 根目录启停入口
 
@@ -88,7 +88,8 @@ friday-project-index/
 ├── FRIDAY-SCRIPT-LICENSE.txt # 保留的工具许可证
 ├── repos.json
 ├── skills/                # 集中维护的技能源码
-│   └── friday-development/ # 开发 Skill、界面元数据与规范副本
+│   ├── friday-development/ # 开发 Skill、界面元数据与规范副本
+│   └── friday-linux-deployment/ # Linux CPU 部署、迁移与实机验收
 ├── .github/               # PR 模板、固定约定快照和检查工作流
 ├── repos/                 # 每个仓库一页简介
 ├── docs/

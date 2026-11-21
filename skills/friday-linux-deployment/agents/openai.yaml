@@ -1,0 +1,4 @@
+interface:
+  display_name: "Friday Linux 部署与验收"
+  short_description: "在原生 Linux 部署 Friday CPU 容器并核验真实摄像头、语音和 KTV"
+  default_prompt: "使用 $friday-linux-deployment 在目标 Linux 电脑上部署 Friday CPU 镜像，并按所选能力完成实机验收。"

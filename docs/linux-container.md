@@ -2,6 +2,23 @@
 
 此入口将本次 Friday 与 ARL 候选代码构建为 `linux/amd64` 镜像。默认启动 Friday 的明确模拟模式、ARL Linux 宿主和本机设置页，使用独立数据卷，不导入 Mac 家庭配置、账号或自动启动摄像头。它是部署基础与启动检查入口，不能把健康状态当成完整家庭功能或实物动作验收。
 
+## 惠普原生 Linux 实机验收
+
+2026-11-21 在惠普 Core i5-7300HQ、约 16 GiB 内存的 Ubuntu 24.04 Live 上，用原生 Docker Engine 验收了已发布的 amd64 镜像。摄像头 SDK 在惠普直连局域网，Mini 播报经 SSH 转发复用家庭原有的 HA。复测这一版本可将下节的 `FRIDAY_RUNTIME_IMAGE` 设为：
+
+```text
+ghcr.io/geeprox/friday-cpu@sha256:cc151e1a7c41f207d58edd7f50ebff91e167d000b5b9da6914abda0bf822f7e8
+```
+
+| 能力 | 本轮结果 |
+| --- | --- |
+| 云台跟踪 | 真人短距离折返，右返跟上、停稳后未见多转。CPU 处理帧率中位数为 3.7 帧/秒，期间曾丢失并重新锁定。 |
+| 摄像头语音 | 首轮收音遇断点；调整验收程序后，复测收到连续 8.2 秒摄像头音频，惠普 CPU 用 0.52 秒识别，整句匹配且本人确认正确。 |
+| Mini 播报 | 惠普经 HA 发送“播放文本”，Mini 设备侧合成，现场听清，原音量和静音均已恢复。设备侧是否依赖云端未验证。 |
+| KTV 分离 | 20 秒音乐由惠普重新分离，固定模型校验通过、缓存未命中，耗时 55.741 秒。使用者对比试听确认伴奏人声明显减少，效果可用。 |
+
+临时容器已移除，原家庭主机接回摄像头并恢复云台保持模式。可复用的操作步骤在 [Linux 部署 Skill](../skills/friday-linux-deployment/SKILL.md)，详细观测在 [Friday 技术文档](https://github.com/Geeprox/Friday/blob/main/docs/linux-runtime.md)。
+
 ## 使用已发布镜像
 
 发布流程成功后，镜像地址为 `ghcr.io/geeprox/friday-cpu`。`main` 指向最新通过验收的主干镜像，生产部署建议从 Actions 发布摘要复制 `@sha256:…` 固定版本；不要把本地构建或 PR 检查成功当成镜像已经发布。

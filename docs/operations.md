@@ -33,6 +33,9 @@
 
 已有 HA 时复用原实例。Xiaomi Home 安装在 HA 内，随 HA 启停；Miloco、插件宿主、ARL 与视觉环境按实际使用情况分别准备。
 
+在 Miloco 宿主机上，Friday 安装入口 `scripts/install-miloco.sh` 会把摄像头授权恢复组件接入安装和升级流程。macOS 通过 launchd、Linux 通过 systemd 用户服务在升级后核对组件，兼容版本可自动补装。步骤见[摄像头安装手册](https://lijunfeng722.github.io/friday-user-guide/getting-started/installation-camera/)。
+
+
 ## 启停脚本与运行方式
 
 | 文件 | 职责 |
